@@ -6,7 +6,7 @@
 /*   By: frmarinh <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/23 12:42:28 by frmarinh          #+#    #+#             */
-/*   Updated: 2016/01/14 01:24:06 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/10 14:33:48 by frmarinh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,4 +96,5 @@ int					ft_check_fd(int *array, int const fd);
 char				*ft_strndup(char *string, size_t size);
 char				*ft_charcat(char *str, char toadd);
 char				*ft_strreverse(char *str);
+char				*ft_substr(char *chaineSource, int pos, int len);
 #endif

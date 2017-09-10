@@ -14,7 +14,71 @@
 # define ALL_H
 
 # include   "../libft/includes/libft.h"
-# include <stdio.h>
+# include	<stdio.h>
+#include	<sys/types.h>
+#include	<sys/stat.h>
+#include	<fcntl.h>
+
+# define FLAG_SEPARATOR "--"
+# define bool int
+# define true 1
+# define false 0
+# define DEFAULT_THREADS 1
+# define MAX_PORTS_SCAN 1024
+# define PORTS_SIZE 65535
+
+typedef struct		s_flag
+{
+	char			*flag;
+	char			*value;
+	struct s_flag	*next;
+}					t_flag;
+
+/*
+**	FLAGS
+*/
+t_flag		*new_flag(char *flag);
+t_flag		*get_flags();
+void		add_flag(char *flag);
+bool		add_value(char *value);
+t_flag		*get_flag(char *name);
+
+t_flag		*g_flags;
+
+typedef struct		s_host
+{
+	char			*address;
+	struct s_host	*next;
+}					t_host;
+
+typedef struct		s_nmap
+{
+	t_host			*hosts;
+	int				*port;
+	int				ports_index;
+	int				threads;
+}					t_nmap;
+
+/*
+**	INITIALIZER
+*/
+void		initializer();
+void		print_error(char *msg);
+
+/*
+**	HOST
+*/
+void		load_hosts(bool multiple_host, t_nmap *nmap);
+
+/*
+**	PORTS
+*/
+void		load_ports();
+
+/*
+**	GNL
+*/
+int			get_next_line(int const fd, char **line);
 
 /*
 ** SYN = synchronization

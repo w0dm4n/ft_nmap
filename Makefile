@@ -28,7 +28,12 @@ LIBFT_DIR			=	libft/
 LIBFT_LIB			=	$(LIBFT_DIR)libft.a
 
 SRCBASE_NMAP	=	\
-					nmap.c
+					nmap.c				\
+					flags.c				\
+					initializer.c		\
+					hosts.c				\
+					ports.c				\
+					get_next_line.c
 
 INCS			=	$(addprefix $(INCDIR), $(INCBASE))
 
