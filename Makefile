@@ -17,7 +17,7 @@ NAMEBASE    =   $(shell basename $(NAME))
 LENGTHNAME	=	`printf "%s" $(NAMEBASE) | wc -c`
 MAX_COLS	=	$$(echo "$$(tput cols)-24-$(LENGTHNAME)"|bc)
 
-CC			=	gcc -ggdb
+CC			=	gcc -ggdb -lpthread
 FLAGS_O		=
 
 SRCDIR_NMAP		=	srcs/
@@ -33,7 +33,10 @@ SRCBASE_NMAP	=	\
 					initializer.c		\
 					hosts.c				\
 					ports.c				\
-					get_next_line.c
+					get_next_line.c		\
+					scan.c				\
+					free.c				\
+					threads.c
 
 INCS			=	$(addprefix $(INCDIR), $(INCBASE))
 

@@ -40,10 +40,11 @@ void			load_ports(t_nmap *nmap)
 	if (!(nmap->port = (int*)malloc(MAX_PORTS_SCAN * sizeof(int))))
 		return;
 	if (!(flag = get_flag("ports"))) {
+		nmap->ports_index = MAX_PORTS_SCAN;
 		while (p < MAX_PORTS_SCAN) {
 			nmap->port[p++] = i++;
 		}
-	} else {
+	} else if (flag->value != NULL) {
 		port = ft_strsplit(flag->value, ',');
 		while (port[p])
 		{
@@ -59,11 +60,15 @@ void			load_ports(t_nmap *nmap)
 					} else {
 						printf("ft_mmap: ports range %d-%d invalid\n", range_start, range_end);
 					}
+					free(range);
 				}
 			} else {
 				add_port(nmap, ft_atoi(port[p]));
 			}
 			p++;
+		}
+		if (port) {
+			free_array(port);
 		}
 	}
 }

@@ -18,6 +18,7 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<fcntl.h>
+#include	<pthread.h>
 
 # define FLAG_SEPARATOR "--"
 # define bool int
@@ -45,6 +46,12 @@ t_flag		*get_flag(char *name);
 
 t_flag		*g_flags;
 
+typedef struct			s_scan_type
+{
+	char				*name;
+	struct s_scan_type	*next;
+}						t_scan_type;
+
 typedef struct		s_host
 {
 	char			*address;
@@ -57,13 +64,22 @@ typedef struct		s_nmap
 	int				*port;
 	int				ports_index;
 	int				threads;
+	t_scan_type		*scans;
 }					t_nmap;
+
+typedef struct		s_thread_handler
+{
+	int				start;
+	int				ports_len;
+	t_nmap			*nmap;
+}					t_thread_handler;
 
 /*
 **	INITIALIZER
 */
 void		initializer();
 void		print_error(char *msg);
+void		free_array(char **array);
 
 /*
 **	HOST
@@ -80,6 +96,20 @@ void		load_ports();
 */
 int			get_next_line(int const fd, char **line);
 
+/*
+**	SCAN
+*/
+bool		load_scans(t_nmap *nmap);
+
+/*
+**	FREE
+*/
+void		free_datas(t_nmap *nmap);
+
+/*
+**	THREADS
+*/
+void		instantiate_threads(t_nmap *nmap);
 /*
 ** SYN = synchronization
 ** ACK = acknowledged
