@@ -43,7 +43,7 @@ static void		loader(bool multiple_host, t_nmap *nmap)
 {
 	load_hosts(multiple_host, nmap);
 	load_ports(nmap);
-	if (load_scans(nmap)) {
+	if (load_scans_type(nmap)) {
 		instantiate_threads(nmap);
 	} else {
 		exit(-1);

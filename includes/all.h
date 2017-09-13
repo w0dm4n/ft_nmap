@@ -97,9 +97,9 @@ void		load_ports();
 int			get_next_line(int const fd, char **line);
 
 /*
-**	SCAN
+**	SCAN_TYPE
 */
-bool		load_scans(t_nmap *nmap);
+bool		load_scans_type(t_nmap *nmap);
 
 /*
 **	FREE
@@ -110,6 +110,12 @@ void		free_datas(t_nmap *nmap);
 **	THREADS
 */
 void		instantiate_threads(t_nmap *nmap);
+
+/*
+**	SCANS
+*/
+void		start_scans(t_thread_handler *handler);
+
 /*
 ** SYN = synchronization
 ** ACK = acknowledged

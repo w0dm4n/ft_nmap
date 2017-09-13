@@ -16,11 +16,7 @@ static void					*in_thread(void *handler)
 {
 	t_thread_handler		*thread_handler = (t_thread_handler*)handler;
 	if (thread_handler) {
-		while (thread_handler->ports_len)
-		{
-			printf("%d\n", thread_handler->nmap->port[thread_handler->start++]);
-			thread_handler->ports_len--;
-		}
+		start_scans(thread_handler);
 	}
 	return (NULL);
 }

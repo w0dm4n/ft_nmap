@@ -34,9 +34,10 @@ SRCBASE_NMAP	=	\
 					hosts.c				\
 					ports.c				\
 					get_next_line.c		\
-					scan.c				\
+					scan_type.c			\
 					free.c				\
-					threads.c
+					threads.c			\
+					scan.c
 
 INCS			=	$(addprefix $(INCDIR), $(INCBASE))
 
