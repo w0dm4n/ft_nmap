@@ -15,7 +15,7 @@
 static t_host	*alloc_host(t_host *to_alloc, char *addr)
 {
 	if (!(to_alloc = (t_host*)malloc(sizeof(struct s_host))))
-		return ;
+		return NULL;
 	to_alloc->address = ft_strdup(addr);
 	to_alloc->next = NULL;
 	to_alloc->addresses = NULL;

@@ -15,16 +15,18 @@
 
 # include   "../libft/includes/libft.h"
 # include	<stdio.h>
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<fcntl.h>
-#include	<pthread.h>
-#include	<netdb.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
+# include	<sys/types.h>
+# include	<sys/stat.h>
+# include	<fcntl.h>
+# include	<pthread.h>
+# include	<netdb.h>
+# include	<sys/socket.h>
+# include	<netinet/in.h>
+# include	<arpa/inet.h>
 # include	<netinet/ip.h>
-#include	<netinet/tcp.h>
+# include	<netinet/tcp.h>
+# include	<netinet/udp.h>
+# include 	<unistd.h>
 
 # define FLAG_SEPARATOR 	"--"
 # define bool 				int
@@ -133,6 +135,13 @@ void				start_scans(t_thread_handler *handler);
 **	CHECKSUM
 */
 unsigned short		checksum(unsigned short *ptr, int nbytes);
+
+/*
+**  HANDLERS
+*/
+void			udp_handler(t_thread_handler *thread_handler, char *scan, char *host);
+void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host);
+void			set_ipv4_header(BYTE *buffer_raw, int raw_len, char *host, u_char protocol);
 /*
 ** SYN = synchronization
 ** ACK = acknowledged

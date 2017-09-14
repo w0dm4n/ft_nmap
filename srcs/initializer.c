@@ -30,7 +30,7 @@ static t_nmap	*init_nmap()
 	t_nmap		*nmap = NULL;
 
 	if (!(nmap = (t_nmap*)malloc(sizeof(struct s_nmap))))
-		return;
+		return NULL;
 	nmap->hosts = NULL;
 	nmap->port = NULL;
 	nmap->threads = DEFAULT_THREADS;
