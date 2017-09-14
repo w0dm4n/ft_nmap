@@ -53,20 +53,9 @@ void						instantiate_threads(t_nmap *nmap)
 	int ports = nmap->ports_index / nmap->threads;
 	while (i < nmap->threads)
 	{
-		if ((i + 1) == nmap->threads) {
-			end_diff = ports * nmap->threads;
-			if (end_diff < nmap->ports_index) {
-				end_diff = nmap->ports_index - end_diff;
-				new_thread(nmap, total, (ports + end_diff));
-				total += ports + end_diff;
-			} else {
-				new_thread(nmap, total, ports);
-				total += ports;
-			}
-		} else {
-			new_thread(nmap, total, ports);
-			total += ports;
-		}
+		int ports_plus = (i < nmap->threads - nmap->ports_index % nmap->threads) ? 0 : 1;
+		new_thread(nmap, total, ports + ports_plus);
+		total += ports + ports_plus;
 		i++;
 	}
 }
