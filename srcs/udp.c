@@ -33,11 +33,12 @@ static SOCKET	init_socket()
 
 void			udp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 {
-	int 		len;
+	int 		raw_len;
 
-	len = sizeof(struct ip) + sizeof(struct udphdr);
+	raw_len = sizeof(struct ip) + sizeof(struct udphdr);
 	thread_handler->fd = init_socket();
 	if (thread_handler->fd == SOCKET_ERROR)
 		return ;
 	set_ipv4_header(thread_handler->buffer_raw, raw_len, host, IPPROTO_UDP);
+
 }
