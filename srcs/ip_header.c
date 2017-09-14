@@ -12,7 +12,7 @@
 
 #include "all.h"
 
-void		set_ipv4_header(BYTE *buffer_raw, int raw_len, char *host, char *proto)
+void		set_ipv4_header(BYTE *buffer_raw, int raw_len, char *host, u_char protocol)
 {
 	struct ip	header;
 
@@ -23,7 +23,7 @@ void		set_ipv4_header(BYTE *buffer_raw, int raw_len, char *host, char *proto)
 		return ;
 	}
 	header.ip_ttl = DEFAULT_TTL; // Time to live
-	header.ip_p = (!ft_strcmp(proto, "tcp")) ? IPPROTO_TCP : IPPROTO_UDP; //  Protocol
+	header.ip_p = protocol; //  Protocol
 	header.ip_v = 4; // IPv4
 	header.ip_hl = sizeof(struct ip) >> 2; // IPv4 header length (4 bits)
 	header.ip_tos = 0;
