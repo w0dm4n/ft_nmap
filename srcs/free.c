@@ -17,6 +17,9 @@ static void			free_hosts(t_nmap *nmap)
 	t_host		*tmp_host = NULL;
 
 	while (nmap->hosts){
+		if (nmap->hosts->addresses) {
+			ft_free_array((void**)nmap->hosts->addresses);
+		}
 		ft_strdel(&nmap->hosts->address);
 		tmp_host = nmap->hosts->next;
 		free(nmap->hosts);

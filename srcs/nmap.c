@@ -14,7 +14,7 @@
 
 static void		print_help()
 {
-	printf("ft_nmap [OPTIONS]\n\n--help Print this help screen\n--ports ports to scan (eg: 1-10 or 1,2,3 or 1,5-15)\n--host ip address to scan in dot format\n--file File name containing IP addresses to scan,\n--speedup [250 max] number of parallel threads to use\n--scan SYN/NULL/FIN/XMAS/ACK/UDP\n");
+	printf("ft_nmap [OPTIONS]\n\n--help Print this help screen\n--ports ports to scan (eg: 1-10 or 1,2,3 or 1,5-15)\n--host ip address to scan in dot format\n--file File name containing IP addresses to scan,\n--speedup [250 max] number of parallel threads to use\n--scan SYN/NULL/FIN/XMAS/ACK/UDP\n--deep For scanning all addresses from a given host\n--src Spoof the src address\n");
 }
 
 static void		check_help(char **argv)

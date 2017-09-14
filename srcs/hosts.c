@@ -18,6 +18,7 @@ static t_host	*alloc_host(t_host *to_alloc, char *addr)
 		return ;
 	to_alloc->address = ft_strdup(addr);
 	to_alloc->next = NULL;
+	to_alloc->addresses = NULL;
 	return (to_alloc);
 }
 

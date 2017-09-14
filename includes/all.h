@@ -19,14 +19,24 @@
 #include	<sys/stat.h>
 #include	<fcntl.h>
 #include	<pthread.h>
+#include	<netdb.h>
+#include	<sys/socket.h>
+#include	<netinet/in.h>
+#include	<arpa/inet.h>
+# include	<netinet/ip.h>
+#include	<netinet/tcp.h>
 
-# define FLAG_SEPARATOR "--"
-# define bool int
-# define true 1
-# define false 0
-# define DEFAULT_THREADS 1
-# define MAX_PORTS_SCAN 1024
-# define PORTS_SIZE 65535
+# define FLAG_SEPARATOR 	"--"
+# define bool 				int
+# define true 				1
+# define false 				0
+# define DEFAULT_THREADS 	1
+# define MAX_PORTS_SCAN 	1024
+# define PORTS_SIZE 		65535
+# define SOCKET				int
+# define SOCKET_ERROR		-1
+# define BYTE				char
+# define DEFAULT_TTL		64
 
 typedef struct		s_flag
 {
@@ -38,11 +48,11 @@ typedef struct		s_flag
 /*
 **	FLAGS
 */
-t_flag		*new_flag(char *flag);
-t_flag		*get_flags();
-void		add_flag(char *flag);
-bool		add_value(char *value);
-t_flag		*get_flag(char *name);
+t_flag				*new_flag(char *flag);
+t_flag				*get_flags();
+void				add_flag(char *flag);
+bool				add_value(char *value);
+t_flag				*get_flag(char *name);
 
 t_flag		*g_flags;
 
@@ -55,6 +65,7 @@ typedef struct			s_scan_type
 typedef struct		s_host
 {
 	char			*address;
+	char			**addresses;
 	struct s_host	*next;
 }					t_host;
 
@@ -69,53 +80,59 @@ typedef struct		s_nmap
 
 typedef struct		s_thread_handler
 {
+	SOCKET			fd;
 	int				start;
 	int				ports_len;
 	t_nmap			*nmap;
+	BYTE			*buffer_raw;
 }					t_thread_handler;
 
 /*
 **	INITIALIZER
 */
-void		initializer();
-void		print_error(char *msg);
-void		free_array(char **array);
+void				initializer();
+void				print_error(char *msg);
+void				free_array(char **array);
 
 /*
 **	HOST
 */
-void		load_hosts(bool multiple_host, t_nmap *nmap);
+void				load_hosts(bool multiple_host, t_nmap *nmap);
 
 /*
 **	PORTS
 */
-void		load_ports();
+void				load_ports();
 
 /*
 **	GNL
 */
-int			get_next_line(int const fd, char **line);
+int					get_next_line(int const fd, char **line);
 
 /*
 **	SCAN_TYPE
 */
-bool		load_scans_type(t_nmap *nmap);
+bool				load_scans_type(t_nmap *nmap);
 
 /*
 **	FREE
 */
-void		free_datas(t_nmap *nmap);
+void				free_datas(t_nmap *nmap);
 
 /*
 **	THREADS
 */
-void		instantiate_threads(t_nmap *nmap);
+void				instantiate_threads(t_nmap *nmap);
 
 /*
 **	SCANS
 */
-void		start_scans(t_thread_handler *handler);
+void				start_scans(t_thread_handler *handler);
 
+/*
+**	CHECKSUM
+*/
+unsigned short		checksum(unsigned short *ptr, int nbytes);
 /*
 ** SYN = synchronization
 ** ACK = acknowledged

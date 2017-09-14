@@ -30,6 +30,7 @@ static t_thread_handler		*alloc_handler(t_nmap *nmap, int index, int len)
 	new->nmap = nmap;
 	new->start = index;
 	new->ports_len = len;
+	new->fd = 0;
 	return (new);
 }
 
