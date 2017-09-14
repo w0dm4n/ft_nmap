@@ -39,6 +39,8 @@ void			udp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 	thread_handler->fd = init_socket();
 	if (thread_handler->fd == SOCKET_ERROR)
 		return ;
+	thread_handler->buffer_raw = malloc(sizeof(*thread_handler->buffer_raw) * raw_len);
+	if (thread_handler->buffer_raw == NULL)
+		return ;
 	set_ipv4_header(thread_handler->buffer_raw, raw_len, host, IPPROTO_UDP);
-
 }
