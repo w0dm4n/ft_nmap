@@ -15,8 +15,9 @@
 void		set_ipv4_header(BYTE *buffer_raw, int raw_len, char *host, u_char protocol)
 {
 	struct ip	header;
+	t_flag		*spoof = get_flag("spoof");
 
-	header.ip_src.s_addr = INADDR_ANY; // spoof flag
+	header.ip_src.s_addr = (spoof && spoof->value) ? inet_addr(spoof->value) : inet_addr(get_default_interface_host()); // spoof flag
 	if (!(inet_pton(AF_INET, host, &(header.ip_dst))))
 	{
 		printf("Can't set destination network address for %s\n", host);
@@ -29,7 +30,8 @@ void		set_ipv4_header(BYTE *buffer_raw, int raw_len, char *host, u_char protocol
 	header.ip_tos = 0;
 	header.ip_len = htons(raw_len);
 	header.ip_off = 0;
+	header.ip_id = 1;
 	header.ip_sum = 0; // set checksum to zero to calculate
-	header.ip_sum = checksum((uint16_t *) &header, sizeof(struct ip)); // calculate checksum
+	header.ip_sum = checksum((unsigned short *) &header, sizeof(struct ip));
 	ft_memcpy((void*)buffer_raw, &header, sizeof(struct ip));
 }

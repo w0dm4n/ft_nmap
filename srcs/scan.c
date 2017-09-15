@@ -60,7 +60,7 @@ static void			initialize_scan(t_thread_handler *thread_handler, char *scan_name)
 				}
 			}
 		} else {
-			printf("Unable to resolve %s :(\n", hosts->address);
+			printf("Failed to resolve \"%s\".\n", hosts->address);
 		}
 		i = 0;
 		hosts = hosts->next;
@@ -70,13 +70,8 @@ static void			initialize_scan(t_thread_handler *thread_handler, char *scan_name)
 void				start_scans(t_thread_handler *thread_handler)
 {
 	t_scan_type		*scans = thread_handler->nmap->scans;
-	/*while (scans) {
+	while (scans) {
 		initialize_scan(thread_handler, scans->name);
 		scans = scans->next;
-	}*/
-	while (thread_handler->ports_len)
-	{
-		printf("%d\n", thread_handler->nmap->port[thread_handler->start++]);
-		thread_handler->ports_len--;
 	}
 }

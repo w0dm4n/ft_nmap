@@ -41,7 +41,10 @@ SRCBASE_NMAP	=	\
 					tcp.c				\
 					udp.c				\
 					ip_header.c			\
-					checksum.c
+					checksum.c			\
+					socket.c			\
+					interface.c			\
+					tcp_flags.c
 
 INCS			=	$(addprefix $(INCDIR), $(INCBASE))
 

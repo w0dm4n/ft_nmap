@@ -24,9 +24,10 @@
 # include	<netinet/in.h>
 # include	<arpa/inet.h>
 # include	<netinet/ip.h>
-# include	<netinet/tcp.h>
+# include	<linux/tcp.h>
 # include	<netinet/udp.h>
 # include 	<unistd.h>
+# include	<ifaddrs.h>
 
 # define FLAG_SEPARATOR 	"--"
 # define bool 				int
@@ -39,6 +40,8 @@
 # define SOCKET_ERROR		-1
 # define BYTE				char
 # define DEFAULT_TTL		64
+# define PAYLOAD			""
+# define DEFAULT_INTERFACE	"eth0"
 
 typedef struct		s_flag
 {
@@ -46,6 +49,18 @@ typedef struct		s_flag
 	char			*value;
 	struct s_flag	*next;
 }					t_flag;
+
+/*
+    96 bit (12 bytes) pseudo header needed for tcp header checksum calculation
+*/
+struct pseudo_header
+{
+    u_int32_t source_address;
+    u_int32_t dest_address;
+    u_int8_t placeholder;
+    u_int8_t protocol;
+    u_int16_t tcp_length;
+};
 
 /*
 **	FLAGS
@@ -142,6 +157,23 @@ unsigned short		checksum(unsigned short *ptr, int nbytes);
 void			udp_handler(t_thread_handler *thread_handler, char *scan, char *host);
 void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host);
 void			set_ipv4_header(BYTE *buffer_raw, int raw_len, char *host, u_char protocol);
+
+/*
+**	SOCKET
+*/
+SOCKET			init_socket(u_char protocol);
+bool			send_socket_raw(t_thread_handler *handler, int raw_len, int port);
+
+/*
+**	INTERFACE
+*/
+char			*get_default_interface_host();
+
+/*
+**	TCP_FLAGS
+*/
+void			get_tcp_flags(struct tcphdr *header, char *scan);
+
 /*
 ** SYN = synchronization
 ** ACK = acknowledged

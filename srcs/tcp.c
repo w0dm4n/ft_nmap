@@ -12,61 +12,73 @@
 
 #include "all.h"
 
-static SOCKET	init_socket()
+void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan)
 {
-	SOCKET	sock = NULL;
-	bool	opt = true;
+	struct tcphdr			header;
+	struct pseudo_header	psh;
+	struct ip				*ip_header = (struct ip*)((void*)buffer_raw);
+	int						len = sizeof(struct pseudo_header) + sizeof(struct tcphdr);
+	char					*pseudogram = malloc(len);
+	t_flag		*spoof = get_flag("spoof");
 
-	if ((sock = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) < 0) // Raw socket descriptor
-	{
-		printf("socket() failed : Operation not permitted\n");
-		return (SOCKET_ERROR);
-	}
-	if ((setsockopt(sock, IPPROTO_IP, IP_HDRINCL, &opt, sizeof(opt))) < 0) // set flag so socket expects us to provide IPv4 header.
-	{
-		printf("setsockopt() failed to set IP_HDRINCL\n");
-		return (SOCKET_ERROR);
-	}
-	return (sock);
+	header.source = htons(port);
+	header.dest = htons(port); //16 bit in nbp format of destination port
+	header.seq = htonl(1); //32 bit sequence number, initially set to zero
+	header.ack_seq = 0; //32 bit ack sequence number, depends whether ACK is set or not
+	header.doff = 5; //4 bits: 5 x 32-bit words on tcp header
+	header.res1 = 0; //4 bits: Not used
+	header.cwr = 0; //Congestion control mechanism
+	header.ece = 0; //Congestion control mechanism
+	header.urg = 0; //Urgent flag
+	header.ack = 0; //Acknownledge
+	header.psh = 0; //Push data immediately
+	header.rst = 0; //RST flag
+	header.syn = 0; //SYN flag
+	header.fin = 0; //Terminates the connection
+	header.window = htons(5840);//0xFFFF; //16 bit max number of databytes
+	header.urg_ptr = 0; //16 bit indicate the urgent data. Only if URG flag is set
+	header.check = 0; //16 bit check sum. Can't calculate at this point
+	get_tcp_flags(&header, scan);
+
+	psh.source_address = (spoof && spoof->value) ? inet_addr(spoof->value) : inet_addr(get_default_interface_host());
+    psh.dest_address = ip_header->ip_dst.s_addr;
+    psh.placeholder = 0;
+    psh.protocol = IPPROTO_TCP;
+    psh.tcp_length = htons(sizeof(struct tcphdr));
+
+	ft_memset(pseudogram, 0, len);
+	ft_memcpy(pseudogram, &psh, sizeof(struct pseudo_header));
+	ft_memcpy(pseudogram + sizeof(struct pseudo_header), &header, sizeof(struct tcphdr));
+
+	header.check = checksum((unsigned short *)pseudogram, len);
+	ft_memcpy((void*)buffer_raw + sizeof(struct ip), &header, sizeof(struct tcphdr));
 }
-
-/*
-	struct tcphdr {
-		u_short	th_sport;		// source port
-		u_short	th_dport;		// destination port
-		tcp_seq	th_seq;			// sequence number
-		tcp_seq	th_ack;			// acknowledgement number
-	#if BYTE_ORDER == LITTLE_ENDIAN
-		u_char	th_x2:4,		//(unused)
-			th_off:4;		//data offset
-	#endif
-	u_char	th_flags;
-	#define	TH_FIN	0x01
-	#define	TH_SYN	0x02
-	#define	TH_RST	0x04
-	#define	TH_PUSH	0x08
-	#define	TH_ACK	0x10
-	#define	TH_URG	0x20
-		u_short	th_win;			// window
-		u_short	th_sum;			// checksum
-		u_short	th_urp;			// urgent pointer
-	};*/
-
-//void			set_tcp_header(BYTE *buffer_raw, )
 
 void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 {
-	int		payload = 0;
+	int		payload = ft_strlen(PAYLOAD);
 	int		raw_len = sizeof(struct ip) + sizeof(struct tcphdr) + payload;
-	if ((thread_handler->fd = init_socket()) != SOCKET_ERROR) {
+	int		ports_len = thread_handler->ports_len;
+	int		start_index = thread_handler->start;
+
+	if ((thread_handler->fd = init_socket(IPPROTO_TCP)) != SOCKET_ERROR) {
 		if (!(thread_handler->buffer_raw = (BYTE*)malloc(raw_len))) {
 			return;
 		}
-		set_ipv4_header(thread_handler->buffer_raw, raw_len, host, "tcp");
+		ft_memset(thread_handler->buffer_raw, 0, raw_len);
+		set_ipv4_header(thread_handler->buffer_raw, raw_len, host, IPPROTO_TCP);
+		while (ports_len)
+		{
+			char	*data_payload = (char*)(thread_handler->buffer_raw + sizeof(struct ip) + sizeof(struct tcphdr));
+			ft_strcpy(data_payload, PAYLOAD);
+			set_tcp_header(thread_handler->buffer_raw, thread_handler->nmap->port[start_index], raw_len, scan);
+			if ((send_socket_raw(thread_handler, raw_len, thread_handler->nmap->port[start_index])) > 0) {
+				printf("Started scan for port %d on host %s with type %s\n", thread_handler->nmap->port[start_index],
+				host, scan);
+			}
+			ports_len--;
+			start_index++;
+		}
+		close (thread_handler->fd);
 	}
-	/*while (thread_handler->ports_len)
-	{
-		printf("%d\n", thread_handler->nmap->port[thread_handler->start++]);
-		thread_handler->ports_len--;
-	}*/
 }

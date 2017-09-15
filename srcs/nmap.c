@@ -31,6 +31,17 @@ static void		check_help(char **argv)
 	}
 }
 
+static void		print_start()
+{
+	t_flag		*spoof = get_flag("spoof");
+	if (spoof && spoof->value) {
+		printf("\nStarting ft_nmap ( http://nmap.org ) with spoof address %s\n", spoof->value);
+	} else {
+		printf("\nStarting ft_nmap ( http://nmap.org )\n");
+	}
+	// date in bonus ?
+}
+
 int				main(int argc, char **argv)
 {
 	int			i		= 1;
@@ -64,6 +75,7 @@ int				main(int argc, char **argv)
 		}
 		i++;
 	}
+	print_start();
 	initializer();
 	return (0);
 }
