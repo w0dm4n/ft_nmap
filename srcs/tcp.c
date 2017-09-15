@@ -56,12 +56,25 @@ void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan)
 	ft_strdel(&pseudogram);
 }
 
+void			wait_answer(t_thread_handler *thread_handler)
+{
+	char				buffer[ANSWER_BUFFER];
+	struct				sockaddr_in from;
+	socklen_t			len = sizeof(from);
+	int					received = 0;
+
+	received = recvfrom(thread_handler->fd, buffer, (ANSWER_BUFFER - 1), 0, (struct sockaddr*)&from, &len);
+	if (received != SOCKET_ERROR) {
+		printf("Received an answer of len %d\n", received);
+	}
+}
+
 void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 {
-	int		payload = ft_strlen(PAYLOAD);
-	int		raw_len = sizeof(struct ip) + sizeof(struct tcphdr) + payload;
-	int		ports_len = thread_handler->ports_len;
-	int		start_index = thread_handler->start;
+	int		payload			= ft_strlen(PAYLOAD);
+	int		raw_len 		= sizeof(struct ip) + sizeof(struct tcphdr) + payload;
+	int		ports_len 		= thread_handler->ports_len;
+	int		start_index 	= thread_handler->start;
 
 	if ((thread_handler->fd = init_socket(IPPROTO_TCP)) != SOCKET_ERROR) {
 		if (!(thread_handler->buffer_raw = (BYTE*)malloc(raw_len))) {
@@ -79,6 +92,7 @@ void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 			if ((send_socket_raw(thread_handler, raw_len, thread_handler->nmap->port[start_index])) > 0) {
 				printf("Started scan for port %d on host %s with type %s\n", thread_handler->nmap->port[start_index],
 				host, scan);
+				wait_answer(thread_handler);
 			}
 			ports_len--;
 			start_index++;

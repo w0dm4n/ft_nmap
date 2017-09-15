@@ -18,5 +18,18 @@ void		get_tcp_flags(struct tcphdr *header, char *scan)
 		header->syn = 1;
 	} else if (!ft_strcmp(scan, "FIN")) {
 		header->fin = 1;
+	} else if (!ft_strcmp(scan, "NULL")) {
+		header->urg = 0;
+		header->ack = 0;
+		header->psh = 0;
+		header->rst = 0;
+		header->syn = 0;
+		header->fin = 0;
+	} else if (!ft_strcmp(scan, "XMAS")) {
+		header->urg = 1;
+		header->psh = 1;
+		header->fin = 1;
+	} else if (!ft_strcmp(scan, "ACK")) {
+		header->ack = 1;
 	}
 }

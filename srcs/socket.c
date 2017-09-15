@@ -12,10 +12,33 @@
 
 #include "all.h"
 
-SOCKET		init_socket(u_char protocol)
+static bool		set_timeout(SOCKET sock)
 {
-	SOCKET	sock = NULL;
-	bool	opt = true;
+	struct timeval		timeout;
+	t_flag				*timeout_flag = get_flag("timeout");
+
+	timeout.tv_usec = 0;
+	timeout.tv_sec = 0;
+	if (timeout_flag && timeout_flag->value) {
+		int value = ft_atoi(timeout_flag->value);
+		if (value <= 10) {
+			timeout.tv_sec = value;
+		} else {
+			timeout.tv_usec = (value * 100);
+		}
+	} else {
+		timeout.tv_sec = DEFAULT_TIMEOUT;
+	}
+	if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0) {
+		return (false);
+	}
+	return (true);
+}
+
+SOCKET			init_socket(u_char protocol)
+{
+	SOCKET			sock = NULL;
+	bool			opt = true;
 
 	if ((sock = socket(AF_INET, SOCK_RAW, protocol)) < 0) // Raw socket descriptor
 	{
@@ -34,10 +57,14 @@ SOCKET		init_socket(u_char protocol)
 		close(sock);
 		return (SOCKET_ERROR);
 	}
+	if ((set_timeout(sock)) != true) {
+		close(sock);
+		return (SOCKET_ERROR);
+	}
 	return (sock);
 }
 
-bool		send_socket_raw(t_thread_handler *handler, int raw_len, int port)
+bool			send_socket_raw(t_thread_handler *handler, int raw_len, int port)
 {
 	struct sockaddr_in		sin;
 	struct ip				*ip_header = (struct ip*)((void*)handler->buffer_raw);

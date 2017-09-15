@@ -42,6 +42,8 @@
 # define DEFAULT_TTL		64
 # define PAYLOAD			""
 # define DEFAULT_INTERFACE	"eth0"
+# define DEFAULT_TIMEOUT	2
+# define ANSWER_BUFFER		4096
 
 typedef struct		s_flag
 {
