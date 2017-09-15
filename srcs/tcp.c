@@ -18,9 +18,11 @@ void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan)
 	struct pseudo_header	psh;
 	struct ip				*ip_header = (struct ip*)((void*)buffer_raw);
 	int						len = sizeof(struct pseudo_header) + sizeof(struct tcphdr);
-	char					*pseudogram = malloc(len);
-	t_flag		*spoof = get_flag("spoof");
+	char					*pseudogram = NULL;
+	t_flag					*spoof = get_flag("spoof");
 
+	if (!(pseudogram = (char*)malloc(len)))
+		return ;
 	header.source = htons(port);
 	header.dest = htons(port); //16 bit in nbp format of destination port
 	header.seq = htonl(1); //32 bit sequence number, initially set to zero
@@ -39,7 +41,6 @@ void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan)
 	header.urg_ptr = 0; //16 bit indicate the urgent data. Only if URG flag is set
 	header.check = 0; //16 bit check sum. Can't calculate at this point
 	get_tcp_flags(&header, scan);
-
 	psh.source_address = (spoof && spoof->value) ? inet_addr(spoof->value) : inet_addr(get_default_interface_host());
     psh.dest_address = ip_header->ip_dst.s_addr;
     psh.placeholder = 0;
@@ -52,6 +53,7 @@ void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan)
 
 	header.check = checksum((unsigned short *)pseudogram, len);
 	ft_memcpy((void*)buffer_raw + sizeof(struct ip), &header, sizeof(struct tcphdr));
+	ft_strdel(&pseudogram);
 }
 
 void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
@@ -69,8 +71,10 @@ void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 		set_ipv4_header(thread_handler->buffer_raw, raw_len, host, IPPROTO_TCP);
 		while (ports_len)
 		{
-			char	*data_payload = (char*)(thread_handler->buffer_raw + sizeof(struct ip) + sizeof(struct tcphdr));
-			ft_strcpy(data_payload, PAYLOAD);
+			if (ft_strlen(PAYLOAD) > 0) {
+				char	*data_payload = (char*)(thread_handler->buffer_raw + sizeof(struct ip) + sizeof(struct tcphdr));
+				ft_strcpy(data_payload, PAYLOAD);
+			}
 			set_tcp_header(thread_handler->buffer_raw, thread_handler->nmap->port[start_index], raw_len, scan);
 			if ((send_socket_raw(thread_handler, raw_len, thread_handler->nmap->port[start_index])) > 0) {
 				printf("Started scan for port %d on host %s with type %s\n", thread_handler->nmap->port[start_index],
