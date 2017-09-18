@@ -68,7 +68,7 @@ void			load_ports(t_nmap *nmap)
 			p++;
 		}
 		if (port) {
-			free_array(port);
+			ft_free_array((void**)port);
 		}
 	}
 }

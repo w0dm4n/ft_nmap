@@ -18,13 +18,6 @@ void			print_error(char *msg)
 	exit(-1);
 }
 
-void			free_array(char **array)
-{
-	int i = 0;
-	while (array[i])
-		ft_strdel(&array[i++]);
-}
-
 static t_nmap	*init_nmap()
 {
 	t_nmap		*nmap = NULL;

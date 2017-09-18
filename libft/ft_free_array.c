@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/14 19:06:46 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/14 19:26:52 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/18 22:11:37 by frmarinh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,11 @@ void	ft_free_array(void **array)
 
 	i = 0;
 	cast = (char**)array;
-	while (cast[i])
-		ft_strdel(&cast[i++]);
-	array = NULL;
+	if (array != NULL)
+	{
+		while (cast[i])
+			ft_strdel(&cast[i++]);
+		free(array);
+		array = NULL;
+	}
 }

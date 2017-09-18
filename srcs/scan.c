@@ -17,8 +17,9 @@ static char			**get_host_addresses(struct hostent *host)
 	char			**hosts		= NULL;
 	struct in_addr	IP;
 	int				i			= 0;
+	int				len			= ft_array_len(host->h_addr_list) + 1;
 
-	if (!(hosts = (char**)malloc(sizeof(ft_array_len(host->h_addr_list)))))
+	if (!(hosts = (char**)malloc(len * sizeof(char*))))
 		return (NULL);
 	i = 0;
 	while (host->h_addr_list[i]) {
