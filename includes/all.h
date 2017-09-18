@@ -28,6 +28,9 @@
 # include	<netinet/udp.h>
 # include 	<unistd.h>
 # include	<ifaddrs.h>
+# include	<pthread.h>
+# include	<pcap/pcap.h>
+# include	<signal.h>
 
 # define FLAG_SEPARATOR 	"--"
 # define bool 				int
@@ -42,7 +45,7 @@
 # define DEFAULT_TTL		64
 # define PAYLOAD			""
 # define DEFAULT_INTERFACE	"eth0"
-# define DEFAULT_TIMEOUT	2
+# define DEFAULT_TIMEOUT	2000
 # define ANSWER_BUFFER		4096
 
 typedef struct		s_flag
@@ -97,15 +100,26 @@ typedef struct		s_nmap
 	t_scan_type		*scans;
 }					t_nmap;
 
-typedef struct		s_thread_handler
+typedef struct					s_thread_handler
 {
-	SOCKET			fd;
-	int				start;
-	int				ports_len;
-	t_nmap			*nmap;
-	BYTE			*buffer_raw;
-}					t_thread_handler;
+	SOCKET						fd;
+	int							start;
+	int							ports_len;
+	t_nmap						*nmap;
+	BYTE						*buffer_raw;
+	pthread_t					thread;
+	struct s_thread_handler		*next;
+}								t_thread_handler;
 
+typedef struct					s_queue
+{
+	int							port;
+	u_char						proto;
+	char						*scan;
+	bool						done;
+	struct s_queue				*next;
+	int							id;
+}								t_queue;
 /*
 **	INITIALIZER
 */
@@ -176,6 +190,26 @@ char			*get_default_interface_host();
 */
 void			get_tcp_flags(struct tcphdr *header, char *scan);
 
+/*
+**	THREAD_HANDLER
+*/
+t_thread_handler		*add_thread_handler(t_thread_handler *threads, t_thread_handler *new_thread);
+
+/*
+**	PCAP
+*/
+void					*init_pcap(void *h);
+
+/*
+**	QUEUE
+*/
+void					add_queue(t_queue *new_queue);
+t_queue					*new_queue(int port, u_char proto, char *scan, int id);
+t_queue					*find_queue(u_char proto, int id);
+
+t_queue					*all_queues;
+pthread_mutex_t			id_lock;
+pthread_mutex_t			queue_lock;
 /*
 ** SYN = synchronization
 ** ACK = acknowledged

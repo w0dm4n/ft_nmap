@@ -31,31 +31,44 @@ static t_thread_handler		*alloc_handler(t_nmap *nmap, int index, int len)
 	new->start = index;
 	new->ports_len = len;
 	new->fd = 0;
+	new->next = NULL;
 	return (new);
 }
 
-void						new_thread(t_nmap *nmap, int index, int len)
+t_thread_handler			*new_thread(t_nmap *nmap, int index, int len)
 {
 	if (len > 0) {
-		pthread_t			thread;
 		t_thread_handler	*handler = alloc_handler(nmap, index, len);
 		if (handler) {
-			pthread_create(&thread, NULL, in_thread, handler);
-			printf("New thread with start index %d started !\n", index);
-			pthread_join(thread, NULL);
+			pthread_create(&handler->thread, NULL, in_thread, handler);
+			return (handler);
 		}
 	}
+	return (NULL);
 }
+
+/*static void					start_threads(t_thread_handler *threads)
+{
+	while (threads)
+	{
+		pthread_join(threads->thread, NULL);
+		threads = threads->next;
+	}
+}*/
 
 void						instantiate_threads(t_nmap *nmap)
 {
+	t_thread_handler		*threads = NULL;
 	int i = 0, end_diff = 0, total = 0;
 	int ports = nmap->ports_index / nmap->threads;
 	while (i < nmap->threads)
 	{
 		int ports_plus = (i < nmap->threads - nmap->ports_index % nmap->threads) ? 0 : 1;
-		new_thread(nmap, total, ports + ports_plus);
+		threads = add_thread_handler(threads, new_thread(nmap, total, ports + ports_plus));
 		total += ports + ports_plus;
 		i++;
 	}
+
+	init_pcap(NULL);
+	while (true);
 }

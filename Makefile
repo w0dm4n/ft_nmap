@@ -6,7 +6,7 @@
 #    By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/05/20 17:57:50 by frmarinh          #+#    #+#              #
-#    Updated: 2017/08/29 00:06:36 by frmarinh         ###   ########.fr        #
+#    Updated: 2017/09/18 04:57:47 by frmarinh         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ NAMEBASE    =   $(shell basename $(NAME))
 LENGTHNAME	=	`printf "%s" $(NAMEBASE) | wc -c`
 MAX_COLS	=	$$(echo "$$(tput cols)-24-$(LENGTHNAME)"|bc)
 
-CC			=	gcc -ggdb -lpthread
+CC			=	gcc -ggdb -lpthread -lpcap
 FLAGS_O		=
 
 SRCDIR_NMAP		=	srcs/
@@ -44,7 +44,11 @@ SRCBASE_NMAP	=	\
 					checksum.c			\
 					socket.c			\
 					interface.c			\
-					tcp_flags.c
+					tcp_flags.c			\
+					thread_handler.c	\
+					id.c				\
+					queue.c				\
+					pcap.c
 
 INCS			=	$(addprefix $(INCDIR), $(INCBASE))
 

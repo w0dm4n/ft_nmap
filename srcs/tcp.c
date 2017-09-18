@@ -12,7 +12,7 @@
 
 #include "all.h"
 
-void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan)
+void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan, int id)
 {
 	struct tcphdr			header;
 	struct pseudo_header	psh;
@@ -23,10 +23,10 @@ void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan)
 
 	if (!(pseudogram = (char*)malloc(len)))
 		return ;
-	header.source = htons(port);
+	header.source = htons(id);
 	header.dest = htons(port); //16 bit in nbp format of destination port
 	header.seq = htonl(1); //32 bit sequence number, initially set to zero
-	header.ack_seq = 0; //32 bit ack sequence number, depends whether ACK is set or not
+	header.ack_seq = 1; //32 bit ack sequence number, depends whether ACK is set or not
 	header.doff = 5; //4 bits: 5 x 32-bit words on tcp header
 	header.res1 = 0; //4 bits: Not used
 	header.cwr = 0; //Congestion control mechanism
@@ -56,17 +56,21 @@ void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan)
 	ft_strdel(&pseudogram);
 }
 
-void			wait_answer(t_thread_handler *thread_handler)
+void			wait_answer_queue(t_thread_handler *thread_handler, int port, char *scan, int id)
 {
-	char				buffer[ANSWER_BUFFER];
-	struct				sockaddr_in from;
-	socklen_t			len = sizeof(from);
-	int					received = 0;
-
-	received = recvfrom(thread_handler->fd, buffer, (ANSWER_BUFFER - 1), 0, (struct sockaddr*)&from, &len);
-	if (received != SOCKET_ERROR) {
-		printf("Received an answer of len %d\n", received);
+	t_queue		*queue = new_queue(port, IPPROTO_TCP, scan, id);
+	if (queue) {
+		add_queue(queue);
+	} else {
+		pthread_mutex_unlock(&queue_lock);
 	}
+}
+
+static void		build_raw(t_thread_handler *thread_handler, int port, int raw_len, char *host, char *scan, int id)
+{
+	ft_memset(thread_handler->buffer_raw, 0, raw_len);
+	set_ipv4_header(thread_handler->buffer_raw, raw_len, host, IPPROTO_TCP);
+	set_tcp_header(thread_handler->buffer_raw, port, raw_len, scan, id);
 }
 
 void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
@@ -75,25 +79,19 @@ void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 	int		raw_len 		= sizeof(struct ip) + sizeof(struct tcphdr) + payload;
 	int		ports_len 		= thread_handler->ports_len;
 	int		start_index 	= thread_handler->start;
+	int		id				= 0;
 
 	if ((thread_handler->fd = init_socket(IPPROTO_TCP)) != SOCKET_ERROR) {
 		if (!(thread_handler->buffer_raw = (BYTE*)malloc(raw_len))) {
 			return;
 		}
-		ft_memset(thread_handler->buffer_raw, 0, raw_len);
-		set_ipv4_header(thread_handler->buffer_raw, raw_len, host, IPPROTO_TCP);
 		while (ports_len)
 		{
-			if (ft_strlen(PAYLOAD) > 0) {
-				char	*data_payload = (char*)(thread_handler->buffer_raw + sizeof(struct ip) + sizeof(struct tcphdr));
-				ft_strcpy(data_payload, PAYLOAD);
-			}
-			set_tcp_header(thread_handler->buffer_raw, thread_handler->nmap->port[start_index], raw_len, scan);
+			id = get_id();
+			build_raw(thread_handler, thread_handler->nmap->port[start_index], raw_len, host, scan, id);
 			if ((send_socket_raw(thread_handler, raw_len, thread_handler->nmap->port[start_index])) > 0) {
-				printf("Started scan for port %d on host %s with type %s\n", thread_handler->nmap->port[start_index],
-				host, scan);
-				wait_answer(thread_handler);
-			}
+				wait_answer_queue(thread_handler, thread_handler->nmap->port[start_index], scan, id);
+			} { pthread_mutex_unlock(&queue_lock); }
 			ports_len--;
 			start_index++;
 		}

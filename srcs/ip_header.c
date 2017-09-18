@@ -30,7 +30,7 @@ void		set_ipv4_header(BYTE *buffer_raw, int raw_len, char *host, u_char protocol
 	header.ip_tos = 0;
 	header.ip_len = htons(raw_len);
 	header.ip_off = 0;
-	header.ip_id = 1;
+	header.ip_id = htons(999);
 	header.ip_sum = 0; // set checksum to zero to calculate
 	header.ip_sum = checksum((unsigned short *) &header, sizeof(struct ip));
 	ft_memcpy((void*)buffer_raw, &header, sizeof(struct ip));
