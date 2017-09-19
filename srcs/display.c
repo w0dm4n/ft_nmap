@@ -79,6 +79,7 @@ static void				display_handler()
 	display_ports(queues, true);
 	printf("\n");
 	display_ports(queues, false);
+	exit(0);
 }
 
 void			init_display()
