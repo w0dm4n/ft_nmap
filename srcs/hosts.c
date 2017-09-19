@@ -6,40 +6,38 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 16:08:20 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/10 16:08:26 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/19 01:26:26 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "all.h"
 
-static t_host	*alloc_host(t_host *to_alloc, char *addr)
+static t_host	*alloc_host(char *addr)
 {
+	t_host		*to_alloc;
+
 	if (!(to_alloc = (t_host*)malloc(sizeof(struct s_host))))
 		return NULL;
-	to_alloc->address = ft_strdup(addr);
-	to_alloc->next = NULL;
+	to_alloc->address = addr;
 	to_alloc->addresses = NULL;
+	to_alloc->next = NULL;
 	return (to_alloc);
 }
 
-static void		add_host(t_nmap *nmap, char *addr)
+static t_host	*add_host(t_host *head, char *addr)
 {
-	t_host		*new = NULL;
-	t_host		*hosts = nmap->hosts;
+	t_host		*tail = head;
 
-	if (hosts) {
-		if (!(new = alloc_host(new, addr)))
-			return ;
-		while (hosts->next)
-			hosts = hosts->next;
-		hosts->next = new;
-	} else {
-		if (!(nmap->hosts = alloc_host(nmap->hosts, addr)))
-			return ;
-	}
+	if (!head)
+		return alloc_host(addr);
+	while (tail->next)
+		tail = tail->next;
+	if ((tail->next = alloc_host(addr)) == NULL)
+		printf("ft_nmap: Can't allocate memory for %s\n", addr);
+	return head;
 }
 
-void			load_hosts(bool multiple_host, t_nmap *nmap)
+bool			load_hosts(bool multiple_host, t_nmap *nmap)
 {
 	t_flag		*flag	= NULL;
 	int			fd		= 0;
@@ -47,17 +45,17 @@ void			load_hosts(bool multiple_host, t_nmap *nmap)
 
 	if (!multiple_host) {
 		flag = get_flag("host");
-		if (!(nmap->hosts = (t_host*)malloc(sizeof(struct s_host))))
-			return ;
-		nmap->hosts->next = NULL;
-		nmap->hosts->address = flag->value;
+		nmap->hosts = alloc_host(ft_strdup(flag->value));
 	} else {
 		flag = get_flag("file");
-		if ((fd = open(flag->value, O_RDONLY)) != -1) {
-			while ((get_next_line(fd, &hosts)) > 0)
-				add_host(nmap, hosts);
-		} else {
-			perror("ft_mmap");
+		if ((fd = open(flag->value, O_RDONLY)) == -1) {
+			perror("ft_nmap");
+			return false;
 		}
+		while (get_next_line(fd, &hosts) > 0) {
+			nmap->hosts = add_host(nmap->hosts, hosts);
+		}
+		close(fd);
 	}
+	return nmap->hosts != NULL;
 }

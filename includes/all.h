@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 13:59:36 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/10 14:00:23 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/19 01:37:14 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,23 +124,21 @@ typedef struct					s_queue
 **	INITIALIZER
 */
 void				initializer();
-void				print_error(char *msg);
-void				free_array(char **array);
 
 /*
 **	HOST
 */
-void				load_hosts(bool multiple_host, t_nmap *nmap);
+bool				load_hosts(bool multiple_host, t_nmap *nmap);
 
 /*
 **	PORTS
 */
-void				load_ports();
+bool				load_ports(t_nmap *nmap);
 
 /*
 **	GNL
 */
-int					get_next_line(int const fd, char **line);
+int				get_next_line(int const fd, char **line);
 
 /*
 **	SCAN_TYPE
@@ -198,7 +196,7 @@ t_thread_handler		*add_thread_handler(t_thread_handler *threads, t_thread_handle
 /*
 **	PCAP
 */
-void					*init_pcap(void *h);
+void					*init_pcap(void *h, t_thread_handler *t);
 
 /*
 **	QUEUE

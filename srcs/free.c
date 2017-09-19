@@ -6,61 +6,64 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/12 17:54:02 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/12 17:54:08 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/19 01:20:10 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "all.h"
 
-static void			free_hosts(t_nmap *nmap)
+static void		my_strdel(char **str)
 {
-	t_host		*tmp_host = NULL;
-
-	while (nmap->hosts){
-		if (nmap->hosts->addresses) {
-			ft_free_array((void**)nmap->hosts->addresses);
-		}
-		ft_strdel(&nmap->hosts->address);
-		tmp_host = nmap->hosts->next;
-		free(nmap->hosts);
-		nmap->hosts = tmp_host;
-	}
+	if (!str || !*str)
+		return ;
+	free(*str);
+	*str = NULL;
 }
 
-static void			free_flags()
+static void		free_hosts(t_host *host)
 {
-	t_flag		*tmp_flag = NULL;
-	t_flag		*flags = get_flags();
-
-	while (flags) {
-		ft_strdel(&flags->flag);
-		if (flags->value) {
-			ft_strdel(&flags->value);
-		}
-		tmp_flag = flags->next;
-		free(flags);
-		flags = tmp_flag;
-	}
+	if (host->next)
+		free_hosts(host->next);
+	if (host->addresses)
+		ft_free_array((void **)host->addresses);
+	if (host->address)
+		my_strdel(&host->address);
+	free(host);
 }
 
-static void			free_scans(t_nmap *nmap)
+static void		free_scans(t_scan_type *scan)
 {
-	t_scan_type		*tmp_type = NULL;
-
-	while (nmap->scans) {
-		ft_strdel(&nmap->scans->name);
-		tmp_type = nmap->scans->next;
-		free(nmap->scans);
-		nmap->scans = tmp_type;
-	}
+	if (scan->next)
+		free_scans(scan->next);
+	if (scan->name)
+		my_strdel(&scan->name);
+	free(scan);
 }
 
-void				free_datas(t_nmap *nmap)
+static void		free_flags(t_flag *flags)
 {
-	free_hosts(nmap);
-	free_scans(nmap);
-	free_flags();
+	if (!flags)
+		return ;
+	if (flags->next)
+		free_flags(flags->next);
+	if (flags->flag)
+		my_strdel(&flags->flag);
+	if (flags->value)
+		my_strdel(&flags->value);
+	free(flags);
+}
 
-	free(nmap->port);
-	free(nmap);
+void			free_datas(t_nmap *nmap)
+{
+	if (nmap)
+	{
+		if (nmap->hosts)
+			free_hosts(nmap->hosts);
+		if (nmap->scans)
+			free_scans(nmap->scans);
+		if (nmap->port)
+			free(nmap->port);
+		free(nmap);
+	}
+	free_flags(get_flags());
 }

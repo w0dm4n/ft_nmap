@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 16:34:42 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/10 16:34:45 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/18 23:55:54 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ static void		add_port(t_nmap *nmap, int port)
 			nmap->port[nmap->ports_index++] = port;
 		}
 	} else {
-		printf("ft_nmap: port %d is invalid ! (1 - %d)\n", port, PORTS_SIZE);
+		printf("ft_mmap: port %d is invalid ! (1 - %d)\n", port, PORTS_SIZE);
 	}
 }
 
-void			load_ports(t_nmap *nmap)
+bool			load_ports(t_nmap *nmap)
 {
 	t_flag		*flag = NULL;
 	int			i = 1, p = 0, range_start = 0, range_end = 0, diff = 0;
@@ -38,7 +38,7 @@ void			load_ports(t_nmap *nmap)
 	char		**port = NULL;
 
 	if (!(nmap->port = (int*)malloc(MAX_PORTS_SCAN * sizeof(int))))
-		return;
+		return false;
 	if (!(flag = get_flag("ports"))) {
 		nmap->ports_index = MAX_PORTS_SCAN;
 		while (p < MAX_PORTS_SCAN) {
@@ -58,7 +58,7 @@ void			load_ports(t_nmap *nmap)
 						while (range_start <= range_end)
 							add_port(nmap, range_start++);
 					} else {
-						printf("ft_nmap: ports range %d-%d invalid\n", range_start, range_end);
+						printf("ft_mmap: ports range %d-%d invalid\n", range_start, range_end);
 					}
 					free(range);
 				}
@@ -68,7 +68,8 @@ void			load_ports(t_nmap *nmap)
 			p++;
 		}
 		if (port) {
-			ft_free_array((void**)port);
+			ft_free_array((void **)port);
 		}
 	}
+	return true;
 }

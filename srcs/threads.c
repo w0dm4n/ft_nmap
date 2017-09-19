@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/12 18:27:05 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/12 18:27:06 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/19 01:40:26 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,20 +47,12 @@ t_thread_handler			*new_thread(t_nmap *nmap, int index, int len)
 	return (NULL);
 }
 
-/*static void					start_threads(t_thread_handler *threads)
-{
-	while (threads)
-	{
-		pthread_join(threads->thread, NULL);
-		threads = threads->next;
-	}
-}*/
-
 void						instantiate_threads(t_nmap *nmap)
 {
 	t_thread_handler		*threads = NULL;
 	int i = 0, end_diff = 0, total = 0;
 	int ports = nmap->ports_index / nmap->threads;
+
 	while (i < nmap->threads)
 	{
 		int ports_plus = (i < nmap->threads - nmap->ports_index % nmap->threads) ? 0 : 1;
@@ -68,7 +60,5 @@ void						instantiate_threads(t_nmap *nmap)
 		total += ports + ports_plus;
 		i++;
 	}
-
-	init_pcap(NULL);
-	while (true);
+	init_pcap(NULL, threads);
 }

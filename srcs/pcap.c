@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/16 04:38:55 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/16 04:39:03 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/19 01:41:41 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void			pcap_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
 {
-	//pthread_mutex_lock(&queue_lock);
     static int count = 1;
 	int i = 0;
 	bytes += 14; // link layer header
@@ -50,7 +49,7 @@ void			pcap_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
     count++;
 }
 
-void				*init_pcap(void *h)
+void				*init_pcap(void *h, t_thread_handler *t)
 {
 	char				*dev = DEFAULT_INTERFACE;
 	char				errbuf[PCAP_ERRBUF_SIZE];

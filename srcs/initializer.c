@@ -6,15 +6,16 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 15:34:01 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/10 15:34:07 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/19 01:22:19 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "all.h"
 
-void			print_error(char *msg)
+static void		print_error(char *msg, t_nmap *nmap)
 {
 	printf("ft_mmap: %s\n", msg);
+	free_datas(nmap);
 	exit(-1);
 }
 
@@ -32,45 +33,41 @@ static t_nmap	*init_nmap()
 	return (nmap);
 }
 
-static void		loader(bool multiple_host, t_nmap *nmap)
-{
-	load_hosts(multiple_host, nmap);
-	load_ports(nmap);
-	if (load_scans_type(nmap)) {
-		instantiate_threads(nmap);
-	} else {
-		exit(-1);
-	}
-	free_datas(nmap);
-}
-
 void			initializer()
 {
-	t_flag		*flag = NULL;
+	t_flag		*host = get_flag("host");
+	t_flag		*file = get_flag("file");
+	t_flag		*speed = get_flag("speedup");
 	t_nmap		*nmap = NULL;
 	bool		multiple_host = false;
 
-	if (((flag = get_flag("host")) != NULL) && ((flag = get_flag("file")) != NULL)) {
-		print_error("you cant set an adress as host and a file container");
+	if (host != NULL && file != NULL) {
+		print_error("you cant set an adress as host and a file container", nmap);
 	}
-	if ((flag = get_flag("host")) && flag->value) {
+	if (host && host->value) {
 		multiple_host = false;
-	} else if ((flag = get_flag("file")) && flag->value) {
+	} else if (file && file->value) {
 		multiple_host = true;
 	}
 	else {
-		print_error("no host has been set (missing flag --host or --file)");
+		print_error("no host has been set (missing flag --host or --file)", nmap);
 	}
-	if ((nmap = init_nmap())) {
-		if ((flag = get_flag("speedup")) != NULL) {
-			if (!flag->value) {
-				 print_error("invalid speedup number [1 - 250]"); return;
+	if ((nmap = init_nmap()) != NULL) {
+		if (speed) {
+			if (speed->value) {
+				int threads = ft_atoi(speed->value);
+
+				if (threads >= 1 && threads <= 250) {
+					nmap->threads = threads;
+				}
+				else
+					print_error("invalid speedup number [1 - 250]", nmap);
 			}
-			int threads = ft_atoi(flag->value);
-			if (threads >= 1 && threads <= 250) {
-				nmap->threads = threads;
-			} else { print_error("invalid speedup number [1 - 250]"); return; }
+			else
+				print_error("invalid speedup number [1 - 250]", nmap);
 		}
-		loader(multiple_host, nmap);
+		if (load_hosts(multiple_host, nmap) && load_ports(nmap) && load_scans_type(nmap))
+			instantiate_threads(nmap);
 	}
+	free_datas(nmap);
 }
