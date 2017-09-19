@@ -35,15 +35,23 @@ static void		print_help()
 		   "--timeout Wait time for host answer (seconds or ms)\n");
 }
 
-static void		print_start()
+void		print_start(t_nmap *nmap)
 {
 	t_flag		*spoof = get_flag("spoof");
+	t_scan_type	*scans = nmap->scans;
 
 	if (spoof && spoof->value) {
 		printf("\nStarting ft_nmap ( http://nmap.org ) with spoof address %s\n", spoof->value);
 	} else {
 		printf("\nStarting ft_nmap ( http://nmap.org )\n");
 	}
+	printf("Scan flags: ");
+	while (scans)
+	{
+		printf("%s ", scans->name);
+		scans = scans->next;
+	}
+	printf("\n");
 	// date in bonus ?
 }
 
@@ -108,7 +116,6 @@ int				main(int argc, char **argv)
 		}
 		i++;
 	}
-	print_start();
 	initializer();
 	return (0);
 }

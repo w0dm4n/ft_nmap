@@ -48,6 +48,7 @@ static void			initialize_scan(t_thread_handler *thread_handler, char *scan_name)
 
 	while (hosts) {
 		if ((host = gethostbyname(hosts->address)) != NULL) {
+
 			if (!hosts->addresses) {
 				hosts->addresses = get_host_addresses(host);
 			}
@@ -76,4 +77,5 @@ void				start_scans(t_thread_handler *thread_handler)
 		initialize_scan(thread_handler, scans->name);
 		scans = scans->next;
 	}
+	pthread_exit(NULL);
 }

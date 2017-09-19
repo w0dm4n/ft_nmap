@@ -12,7 +12,7 @@
 
 #include "all.h"
 
-t_queue			*new_queue(int port, u_char proto, char *scan, int id)
+t_queue			*new_queue(int port, u_char proto, char *scan, int id, char *host)
 {
 	t_queue		*new_queue = NULL;
 
@@ -24,6 +24,9 @@ t_queue			*new_queue(int port, u_char proto, char *scan, int id)
 	new_queue->scan = ft_strdup(scan);
 	new_queue->done = false;
 	new_queue->id = id;
+	new_queue->filtered = true;
+	new_queue->open = false;
+	new_queue->host = ft_strdup(host);
 	return (new_queue);
 }
 

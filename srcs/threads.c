@@ -71,5 +71,8 @@ void						instantiate_threads(t_nmap *nmap)
 		i++;
 	}
 	init_pcap(NULL, threads);
-	free_threads(threads);
+	init_display();
+	//free_datas(nmap);
+	//free_threads(threads);
+	while (true);
 }

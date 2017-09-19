@@ -53,6 +53,8 @@ static void		free_queues(t_queue *queue)
 		free_queues(queue->next);
 	if (queue->scan)
 		ft_strdel(&queue->scan);
+	if (queue->host)
+		ft_strdel(&queue->host);
 	free(queue);
 }
 

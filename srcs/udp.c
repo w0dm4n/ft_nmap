@@ -30,21 +30,18 @@ static bool				set_udp_header(t_thread_handler *handler, int port, int id)
 {
 	struct ip				*ip_header = (struct ip*)((void*)handler->buffer_raw);
 	struct udphdr			header;
-	BYTE					*pseudogram;
 	struct pseudo_header	psh;
 	int						len = sizeof(struct pseudo_header) + sizeof(struct udphdr);
+	BYTE					pseudogram[len];
 
-	if (!(pseudogram = (BYTE*)malloc(len)))
-		return false;
 	header.source	= htons(id);
 	header.dest		= htons(port);
 	header.len		= htons(sizeof(struct udphdr));
 	header.check	= 0;
 
-	set_pseudogram(pseudogram, &psh, &header, len, ip_header, handler->nmap->device);
-	header.check = checksum((unsigned short*)pseudogram, len);
+	set_pseudogram((char*)&pseudogram, &psh, &header, len, ip_header, handler->nmap->device);
+	header.check = checksum((unsigned short*)&pseudogram, len);
 	ft_memcpy(handler->buffer_raw + sizeof(struct ip), &header, sizeof(struct udphdr));
-	ft_strdel(&pseudogram);
 	return true;
 }
 
@@ -55,9 +52,9 @@ static bool			build_raw(t_thread_handler *handler, int port, int raw_len, char *
 			set_udp_header(handler, port, id));
 }
 
-static void			wait_answer_queue(t_thread_handler *thread_handler, int port, char *scan, int id)
+static void			wait_answer_queue(t_thread_handler *thread_handler, int port, char *scan, int id, char *host)
 {
-	t_queue		*queue = new_queue(port, IPPROTO_UDP, scan, id);
+	t_queue		*queue = new_queue(port, IPPROTO_UDP, scan, id, host);
 
 	if (queue) {
 		add_queue(queue);
@@ -83,7 +80,7 @@ void				udp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 				if (!build_raw(thread_handler, thread_handler->nmap->port[start_index], raw_len, host, id))
 					break ;
 				if ((send_socket_raw(thread_handler, raw_len, thread_handler->nmap->port[start_index])) > 0) {
-					wait_answer_queue(thread_handler, thread_handler->nmap->port[start_index], scan, id);
+					wait_answer_queue(thread_handler, thread_handler->nmap->port[start_index], scan, id, host);
 				} else { pthread_mutex_unlock(&queue_lock); }
 				ports_len--;
 				start_index++;
@@ -92,5 +89,4 @@ void				udp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 		}
 		close(thread_handler->fd);
 	}
-	pthread_exit(NULL);
 }

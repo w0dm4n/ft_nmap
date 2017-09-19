@@ -47,6 +47,7 @@
 # define DEFAULT_INTERFACE	"eth0"
 # define DEFAULT_TIMEOUT	2000
 # define ANSWER_BUFFER		4096
+# define EXECUTION_TIME		3
 
 typedef struct		s_flag
 {
@@ -112,13 +113,21 @@ typedef struct					s_thread_handler
 
 typedef struct					s_queue
 {
+	bool						filtered;
+	bool						open;
 	int							port;
 	u_char						proto;
 	char						*scan;
 	bool						done;
 	int							id;
 	struct s_queue				*next;
+	char						*host;
 }								t_queue;
+/*
+**	MAIN
+*/
+void				print_start(t_nmap *nmap);
+
 /*
 **	INITIALIZER
 */
@@ -201,7 +210,7 @@ void					*init_pcap(void *h, t_thread_handler *t);
 **	QUEUE
 */
 void					add_queue(t_queue *new_queue);
-t_queue					*new_queue(int port, u_char proto, char *scan, int id);
+t_queue					*new_queue(int port, u_char proto, char *scan, int id, char *host);
 t_queue					*find_queue(u_char proto, int id);
 
 /*
@@ -222,6 +231,11 @@ pthread_mutex_t			queue_lock;
 **  ID
 */
 int						get_id(void);
+
+/*
+**	DISPLAY
+*/
+void					init_display();
 
 /*
 ** SYN = synchronization

@@ -48,7 +48,8 @@ SRCBASE_NMAP	=	\
 					thread_handler.c	\
 					id.c				\
 					queue.c				\
-					pcap.c
+					pcap.c				\
+					display.c
 
 INCS			=	$(addprefix $(INCDIR), $(INCBASE))
 

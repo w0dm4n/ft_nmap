@@ -58,7 +58,7 @@ void			initializer()
 			if (speed) {
 				if (speed->value) {
 					int threads = ft_atoi(speed->value);
-					
+
 					if (threads >= 1 && threads <= 250) {
 						nmap->threads = threads;
 					}
@@ -68,9 +68,10 @@ void			initializer()
 				else
 					print_error("invalid speedup number [1 - 250]", nmap);
 			}
-			if (load_hosts(multiple_host, nmap) && load_ports(nmap) && load_scans_type(nmap))
+			if (load_hosts(multiple_host, nmap) && load_ports(nmap) && load_scans_type(nmap)) {
+				print_start(nmap);
 				instantiate_threads(nmap);
+			}
 		}
 	}
-	free_datas(nmap);
 }

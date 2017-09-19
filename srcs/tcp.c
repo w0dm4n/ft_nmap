@@ -32,10 +32,8 @@ static bool					set_tcp_header(t_thread_handler *thread, int port, int raw_len, 
 	struct pseudo_header	psh;
 	struct ip				*ip_header = (struct ip*)((void*)thread->buffer_raw);
 	int						len = sizeof(struct pseudo_header) + sizeof(struct tcphdr);
-	char					*pseudogram;
+	BYTE					pseudogram[len];
 
-	if (!(pseudogram = (char*)malloc(len)))
-		return false;
 	header.source = htons(id);
 	header.dest = htons(port); //16 bit in nbp format of destination port
 	header.seq = htonl(1); //32 bit sequence number, initially set to zero
@@ -54,16 +52,15 @@ static bool					set_tcp_header(t_thread_handler *thread, int port, int raw_len, 
 	header.urg_ptr = 0; //16 bit indicate the urgent data. Only if URG flag is set
 	header.check = 0; //16 bit check sum. Can't calculate at this point
 	get_tcp_flags(&header, scan);
-	set_pseudogram(pseudogram, &psh, &header, len, ip_header, thread->nmap->device);
+	set_pseudogram((char*)&pseudogram, &psh, &header, len, ip_header, thread->nmap->device);
 	header.check = checksum((unsigned short *)pseudogram, len);
 	ft_memcpy((void*)thread->buffer_raw + sizeof(struct ip), &header, sizeof(struct tcphdr));
-	ft_strdel(&pseudogram);
 	return true;
 }
 
-static void		wait_answer_queue(t_thread_handler *thread_handler, int port, char *scan, int id)
+static void		wait_answer_queue(t_thread_handler *thread_handler, int port, char *scan, int id, char *host)
 {
-	t_queue		*queue = new_queue(port, IPPROTO_TCP, scan, id);
+	t_queue		*queue = new_queue(port, IPPROTO_TCP, scan, id, host);
 
 	if (queue) {
 		add_queue(queue);
@@ -94,7 +91,7 @@ void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 				if (!build_raw(thread_handler, thread_handler->nmap->port[start_index], raw_len, host, scan, id))
 					break ;
 				if ((send_socket_raw(thread_handler, raw_len, thread_handler->nmap->port[start_index])) > 0) {
-					wait_answer_queue(thread_handler, thread_handler->nmap->port[start_index], scan, id);
+					wait_answer_queue(thread_handler, thread_handler->nmap->port[start_index], scan, id, host);
 				} else { pthread_mutex_unlock(&queue_lock); }
 				ports_len--;
 				start_index++;
@@ -103,5 +100,4 @@ void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 		}
 		close (thread_handler->fd);
 	}
-	pthread_exit(NULL);
 }
