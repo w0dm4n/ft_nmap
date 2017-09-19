@@ -64,7 +64,7 @@ static void				parse_not_done(t_queue *queues)
 				queues->open = false;
 				queues->filtered = true;
 			}
-			else if (!ft_strcmp(queues->scan, "UDP")) {
+			else { // other type are all opened when there is no answer (at least we think)
 				queues->open = true;
 			}
 		}
