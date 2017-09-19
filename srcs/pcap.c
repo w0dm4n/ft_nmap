@@ -20,8 +20,8 @@ void			pcap_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
 	bytes += 14; // link layer header
 	struct ip	*header = (struct ip*)bytes;
 	if (header->ip_p == IPPROTO_TCP) {
-		struct tcphdr			*tcp_header = (struct tcphdr*)((void*)bytes + sizeof(struct ip));
-		int id = ntohs(tcp_header->dest);
+		struct tcphdr			*tcp_header		= (struct tcphdr*)((void*)bytes + sizeof(struct ip));
+		int						id				= ntohs(tcp_header->dest);
 		t_queue *queue = find_queue(IPPROTO_TCP, id);
 		if (queue) {
 			if (!ft_strcmp(queue->scan, "SYN") && tcp_header->syn && tcp_header->ack) {
@@ -36,31 +36,18 @@ void			pcap_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
 				printf("XMAS SCAN: %d/tcp closed (%d)\n", queue->port, ntohs(tcp_header->source));
 			}
 			queue->done = true;
-		} else {
-			//struct ip				*ip_header = (struct ip*)((void*)bytes);
-			//printf("%s\n", inet_ntoa(ip_header->ip_src));
-			//printf("ID: %d, port: %d\n", ntohs(tcp_header->source), ntohs(tcp_header->dest));
 		}
-	} else if (header->ip_p == IPPROTO_UDP)
-	{
-
 	}
-	/*printf("Merci pcap: %d\n", sizeof(struct pcap_pkthdr));
-	while (i < h->len)
+	else if (header->ip_p == IPPROTO_ICMP)
 	{
-		printf("%x", bytes[i++]);
+		struct ip				*ip_header		= (struct ip*)((void*)bytes);
+		t_queue *queue = find_queue(IPPROTO_UDP, -1);
+		if (queue) {
+			printf("UDP SCAN: %d/udp closed\n", queue->port);
+		}
 	}
-	printf("\n");
-	printf("len: %d, caplen: %d\n", h->len, h->caplen);
-	printf("%d : %d\n", sizeof(u_char), sizeof(char));
-*/
-	/*struct ip				*ip_header = (struct ip*)((void*)bytes);
-	//struct tcphdr			*tcp_header = (struct tcphdr*)((void*)bytes + sizeof(struct ip));
-
-	printf("%s\n", inet_ntoa(ip_header->ip_src));*/
     fflush(stdout);
     count++;
-	//pthread_mutex_unlock(&queue_lock);
 }
 
 void				*init_pcap(void *h)

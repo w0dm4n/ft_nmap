@@ -12,14 +12,27 @@
 
 #include "all.h"
 
+static void		set_pseudogram(char *pseudogram, struct pseudo_header *psh, struct tcphdr *header, int len, struct ip *ip_header)
+{
+	t_flag					*spoof = get_flag("spoof");
+
+	psh->source_address = (spoof && spoof->value) ? inet_addr(spoof->value) : inet_addr(get_default_interface_host());
+	psh->dest_address = ip_header->ip_dst.s_addr;
+	psh->placeholder = 0;
+	psh->protocol = IPPROTO_TCP;
+	psh->length = htons(sizeof(struct tcphdr));
+	ft_memset(pseudogram, 0, len);
+	ft_memcpy(pseudogram, psh, sizeof(struct pseudo_header));
+	ft_memcpy(pseudogram + sizeof(struct pseudo_header), header, sizeof(struct tcphdr));
+}
+
 void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan, int id)
 {
 	struct tcphdr			header;
 	struct pseudo_header	psh;
 	struct ip				*ip_header = (struct ip*)((void*)buffer_raw);
 	int						len = sizeof(struct pseudo_header) + sizeof(struct tcphdr);
-	char					*pseudogram = NULL;
-	t_flag					*spoof = get_flag("spoof");
+	char					*pseudogram;
 
 	if (!(pseudogram = (char*)malloc(len)))
 		return ;
@@ -41,16 +54,7 @@ void			set_tcp_header(BYTE *buffer_raw, int port, int raw_len, char *scan, int i
 	header.urg_ptr = 0; //16 bit indicate the urgent data. Only if URG flag is set
 	header.check = 0; //16 bit check sum. Can't calculate at this point
 	get_tcp_flags(&header, scan);
-	psh.source_address = (spoof && spoof->value) ? inet_addr(spoof->value) : inet_addr(get_default_interface_host());
-    psh.dest_address = ip_header->ip_dst.s_addr;
-    psh.placeholder = 0;
-    psh.protocol = IPPROTO_TCP;
-    psh.tcp_length = htons(sizeof(struct tcphdr));
-
-	ft_memset(pseudogram, 0, len);
-	ft_memcpy(pseudogram, &psh, sizeof(struct pseudo_header));
-	ft_memcpy(pseudogram + sizeof(struct pseudo_header), &header, sizeof(struct tcphdr));
-
+	set_pseudogram(pseudogram, &psh, &header, len, ip_header);
 	header.check = checksum((unsigned short *)pseudogram, len);
 	ft_memcpy((void*)buffer_raw + sizeof(struct ip), &header, sizeof(struct tcphdr));
 	ft_strdel(&pseudogram);
@@ -75,8 +79,7 @@ static void		build_raw(t_thread_handler *thread_handler, int port, int raw_len, 
 
 void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 {
-	int		payload			= ft_strlen(PAYLOAD);
-	int		raw_len 		= sizeof(struct ip) + sizeof(struct tcphdr) + payload;
+	int		raw_len 		= sizeof(struct ip) + sizeof(struct tcphdr);
 	int		ports_len 		= thread_handler->ports_len;
 	int		start_index 	= thread_handler->start;
 	int		id				= 0;
@@ -91,7 +94,7 @@ void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 			build_raw(thread_handler, thread_handler->nmap->port[start_index], raw_len, host, scan, id);
 			if ((send_socket_raw(thread_handler, raw_len, thread_handler->nmap->port[start_index])) > 0) {
 				wait_answer_queue(thread_handler, thread_handler->nmap->port[start_index], scan, id);
-			} { pthread_mutex_unlock(&queue_lock); }
+			} else { pthread_mutex_unlock(&queue_lock); }
 			ports_len--;
 			start_index++;
 		}

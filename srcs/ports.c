@@ -26,7 +26,7 @@ static void		add_port(t_nmap *nmap, int port)
 			nmap->port[nmap->ports_index++] = port;
 		}
 	} else {
-		printf("ft_mmap: port %d is invalid ! (1 - %d)\n", port, PORTS_SIZE);
+		printf("ft_nmap: port %d is invalid ! (1 - %d)\n", port, PORTS_SIZE);
 	}
 }
 
@@ -58,7 +58,7 @@ void			load_ports(t_nmap *nmap)
 						while (range_start <= range_end)
 							add_port(nmap, range_start++);
 					} else {
-						printf("ft_mmap: ports range %d-%d invalid\n", range_start, range_end);
+						printf("ft_nmap: ports range %d-%d invalid\n", range_start, range_end);
 					}
 					free(range);
 				}

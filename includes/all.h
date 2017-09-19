@@ -64,7 +64,7 @@ struct pseudo_header
     u_int32_t dest_address;
     u_int8_t placeholder;
     u_int8_t protocol;
-    u_int16_t tcp_length;
+    u_int16_t length;
 };
 
 /*
@@ -206,6 +206,11 @@ void					*init_pcap(void *h);
 void					add_queue(t_queue *new_queue);
 t_queue					*new_queue(int port, u_char proto, char *scan, int id);
 t_queue					*find_queue(u_char proto, int id);
+
+/*
+**	PSEUDO_HEADER
+*/
+char					*get_pseudo_header(int protohdr_len, void *proto_header, u_char proto, struct ip *ip_header);
 
 t_queue					*all_queues;
 pthread_mutex_t			id_lock;

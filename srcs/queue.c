@@ -45,6 +45,10 @@ t_queue		*find_queue(u_char proto, int id)
 	t_queue	*tmp = all_queues;
 	while (tmp)
 	{
+		if (id == -1 && tmp->proto == IPPROTO_UDP) {
+			pthread_mutex_unlock(&queue_lock);
+			return (tmp);
+		}
 		if (tmp->id == id && tmp->proto == proto && !tmp->done) {
 			pthread_mutex_unlock(&queue_lock);
 			return (tmp);
