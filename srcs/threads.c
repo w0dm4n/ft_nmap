@@ -6,15 +6,25 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/12 18:27:05 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/19 01:40:26 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/19 03:14:23 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "all.h"
 
+static void					free_threads(t_thread_handler *thread)
+{
+	if (!thread)
+		return ;
+	if (thread->next)
+		free_threads(thread->next);
+	free(thread);
+}
+
 static void					*in_thread(void *handler)
 {
 	t_thread_handler		*thread_handler = (t_thread_handler*)handler;
+
 	if (thread_handler) {
 		start_scans(thread_handler);
 	}
@@ -61,4 +71,5 @@ void						instantiate_threads(t_nmap *nmap)
 		i++;
 	}
 	init_pcap(NULL, threads);
+	free_threads(threads);
 }

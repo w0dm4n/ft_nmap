@@ -3,110 +3,74 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strsplit.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frmarinh <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/11/27 06:16:15 by frmarinh          #+#    #+#             */
-/*   Updated: 2015/12/12 05:01:07 by frmarinh         ###   ########.fr       */
+/*   Created: 2013/11/28 00:58:36 by gbourgeo          #+#    #+#             */
+/*   Updated: 2014/03/27 19:29:35 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdlib.h>
 
-static int		where(char const *s, int pos, char c)
+static int		tab_col(char const *s, char c)
 {
-	int i;
+	int			col;
+
+	col = 0;
+	while (s[col] != c && s[col] != '\0')
+		++col;
+	return (col + 1);
+}
+
+static int		tab_line(char const *str, char c)
+{
+	int			i;
+	int			lin;
 
 	i = 0;
-	while (s[pos])
+	lin = 0;
+	if (str)
 	{
-		if (pos == 0)
-			if (s[pos] != c)
-				return (pos);
-		if (s[pos] == c)
+		while (str[i] != '\0')
 		{
-			i++;
-			break ;
+			if (str[i] != c && str[i] != '\0')
+			{
+				while (str[i] != c && str[i] != '\0')
+					++i;
+				++lin;
+			}
+			while (str[i] == c && str[i] != '\0')
+				++i;
 		}
-		pos++;
 	}
-	return ((pos + i));
-}
-
-static int		char_nbr(char const *s, char c)
-{
-	int i;
-	int nbr;
-
-	i = 0;
-	nbr = 0;
-	while (s[i])
-	{
-		if (s[i] == c || s[i + 1] == '\0')
-			nbr++;
-		i++;
-	}
-	return (nbr);
-}
-
-static int		next(char const *s, int pos, char c)
-{
-	int i;
-
-	i = 0;
-	while (s[pos])
-	{
-		if (s[pos] != c)
-			pos++;
-		else
-			break ;
-		i++;
-	}
-	return (pos);
-}
-
-static char		*get_from(char const *s, int start, int end)
-{
-	char	*tmp;
-	int		i;
-
-	i = 0;
-	if (!(tmp = ft_strnew(ft_strlen(s))))
-		return (NULL);
-	while (start < end)
-	{
-		tmp[i] = s[start];
-		i++;
-		start++;
-	}
-	tmp[i] = '\0';
-	return (tmp);
+	return (lin + 1);
 }
 
 char			**ft_strsplit(char const *s, char c)
 {
-	int		pos;
-	int		nbr;
-	char	*res;
-	char	**tmp;
-	int		occurence;
+	int			i;
+	int			j;
+	int			k;
+	char		**tab;
 
-	pos = 0;
-	occurence = 0;
-	if (!(res = ft_strnew(ft_strlen(s))))
+	i = 0;
+	j = 0;
+	k = 0;
+	if (s == NULL)
 		return (NULL);
-	nbr = char_nbr(s, c) + 1;
-	if (!(tmp = malloc(sizeof(char) * (ft_strlen(s) * ft_strlen(s)))))
+	if ((tab = (char**)malloc(sizeof(*tab) * tab_line(s, c))) == NULL)
 		return (NULL);
-	while (nbr-- > 0)
+	while (tab_line(&s[i], c) > 1)
 	{
-		pos = where(s, pos, c);
-		res = get_from(s, pos, next(s, pos, c));
-		if (res[0])
-			tmp[occurence++] = res;
-		if (pos == 0)
-			pos++;
+		while (s[i] == c && s[i] != '\0')
+			++i;
+		if ((tab[j] = (char*)malloc(sizeof(char) * tab_col(&s[i], c))) == NULL)
+			return (NULL);
+		while (s[i] != c && s[i] != '\0')
+			tab[j][k++] = s[i++];
+		tab[j++][k] = '\0';
+		k = 0;
 	}
-	tmp[occurence] = NULL;
-	return (tmp);
+	tab[j] = NULL;
+	return (tab);
 }

@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 13:59:36 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/19 01:37:14 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/19 03:14:09 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,6 @@ void				add_flag(char *flag);
 bool				add_value(char *value);
 t_flag				*get_flag(char *name);
 
-t_flag		*g_flags;
-
 typedef struct			s_scan_type
 {
 	char				*name;
@@ -98,6 +96,7 @@ typedef struct		s_nmap
 	int				ports_index;
 	int				threads;
 	t_scan_type		*scans;
+	char			*device;
 }					t_nmap;
 
 typedef struct					s_thread_handler
@@ -117,8 +116,8 @@ typedef struct					s_queue
 	u_char						proto;
 	char						*scan;
 	bool						done;
-	struct s_queue				*next;
 	int							id;
+	struct s_queue				*next;
 }								t_queue;
 /*
 **	INITIALIZER
@@ -168,9 +167,9 @@ unsigned short		checksum(unsigned short *ptr, int nbytes);
 /*
 **  HANDLERS
 */
-void			udp_handler(t_thread_handler *thread_handler, char *scan, char *host);
-void			tcp_handler(t_thread_handler *thread_handler, char *scan, char *host);
-void			set_ipv4_header(BYTE *buffer_raw, int raw_len, char *host, u_char protocol);
+void					udp_handler(t_thread_handler *thread_handler, char *scan, char *host);
+void					tcp_handler(t_thread_handler *thread_handler, char *scan, char *host);
+bool					set_ipv4_header(t_thread_handler *thread, int raw_len, char *host, u_char protocol);
 
 /*
 **	SOCKET
@@ -210,9 +209,20 @@ t_queue					*find_queue(u_char proto, int id);
 */
 char					*get_pseudo_header(int protohdr_len, void *proto_header, u_char proto, struct ip *ip_header);
 
+
+/*
+**  GLOBALS
+*/
+t_flag					*g_flags;
 t_queue					*all_queues;
 pthread_mutex_t			id_lock;
 pthread_mutex_t			queue_lock;
+
+/*
+**  ID
+*/
+int						get_id(void);
+
 /*
 ** SYN = synchronization
 ** ACK = acknowledged

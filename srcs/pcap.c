@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/16 04:38:55 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/19 01:41:41 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/19 03:06:21 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,21 +80,17 @@ void				*init_pcap(void *h, t_thread_handler *t)
 	inet_ntop(AF_INET, (char*) &net, netstr, sizeof (netstr));
 	inet_ntop(AF_INET, (char*) &mask, maskstr, sizeof (maskstr));
 	sprintf(filter_exp, "tcp or udp");
-	if (pcap_compile(handle, &fp, filter_exp, 1, mask) == -1)
-	{
-		printf("ft_nmap: couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
-		return (NULL);
+	if (pcap_compile(handle, &fp, filter_exp, 1, mask) != -1) {
+		if (pcap_setfilter(handle, &fp) != -1) {
+			pcount = pcap_dispatch(handle, -1, pcap_dump, NULL);
+			if (pcount < 0)
+				printf("ft_nmap: error reading packets from interface %s: %s", dev, pcap_geterr(handle));
+		}
+		else
+			printf("ft_nmap: couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
 	}
-	if (pcap_setfilter(handle, &fp) == -1) {
+	else
 		printf("ft_nmap: couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
-		return (NULL);
-	}
-	pcount = pcap_dispatch(handle, -1, pcap_dump, NULL);
-	if (pcount < 0)
-	{
-		printf("ft_nmap: error reading packets from interface %s: %s", dev, pcap_geterr(handle));
-		return (NULL);
-	}
 	pcap_close(handle);
 	return (NULL);
 }

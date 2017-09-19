@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/15 01:17:15 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/15 01:17:21 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/19 02:28:01 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 SOCKET			init_socket(u_char protocol)
 {
-	SOCKET			sock = NULL;
+	SOCKET			sock = 0;
 	bool			opt = true;
 
 	if ((sock = socket(AF_INET, SOCK_RAW, protocol)) < 0) // Raw socket descriptor

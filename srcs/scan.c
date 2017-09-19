@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/13 21:31:08 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/13 21:31:13 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/19 01:54:56 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ static void			initialize_scan(t_thread_handler *thread_handler, char *scan_name)
 void				start_scans(t_thread_handler *thread_handler)
 {
 	t_scan_type		*scans = thread_handler->nmap->scans;
+
 	while (scans) {
 		initialize_scan(thread_handler, scans->name);
 		scans = scans->next;

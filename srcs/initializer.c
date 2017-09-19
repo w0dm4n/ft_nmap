@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 15:34:01 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/19 01:22:19 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/19 02:10:40 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ static t_nmap	*init_nmap()
 	nmap->threads = DEFAULT_THREADS;
 	nmap->ports_index = 0;
 	nmap->scans = NULL;
+	nmap->device = get_default_interface_host();
 	return (nmap);
 }
 
@@ -53,21 +54,23 @@ void			initializer()
 		print_error("no host has been set (missing flag --host or --file)", nmap);
 	}
 	if ((nmap = init_nmap()) != NULL) {
-		if (speed) {
-			if (speed->value) {
-				int threads = ft_atoi(speed->value);
-
-				if (threads >= 1 && threads <= 250) {
-					nmap->threads = threads;
+		if (nmap->device != NULL) {
+			if (speed) {
+				if (speed->value) {
+					int threads = ft_atoi(speed->value);
+					
+					if (threads >= 1 && threads <= 250) {
+						nmap->threads = threads;
+					}
+					else
+						print_error("invalid speedup number [1 - 250]", nmap);
 				}
 				else
 					print_error("invalid speedup number [1 - 250]", nmap);
 			}
-			else
-				print_error("invalid speedup number [1 - 250]", nmap);
+			if (load_hosts(multiple_host, nmap) && load_ports(nmap) && load_scans_type(nmap))
+				instantiate_threads(nmap);
 		}
-		if (load_hosts(multiple_host, nmap) && load_ports(nmap) && load_scans_type(nmap))
-			instantiate_threads(nmap);
 	}
 	free_datas(nmap);
 }
