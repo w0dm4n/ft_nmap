@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/12 18:27:05 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/19 03:14:23 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/19 18:29:14 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static void					*in_thread(void *handler)
 	if (thread_handler) {
 		start_scans(thread_handler);
 	}
-	return (NULL);
+	pthread_exit(NULL);
 }
 
 static t_thread_handler		*alloc_handler(t_nmap *nmap, int index, int len)

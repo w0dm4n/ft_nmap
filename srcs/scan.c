@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/13 21:31:08 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/19 01:54:56 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/19 18:29:09 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,5 +77,4 @@ void				start_scans(t_thread_handler *thread_handler)
 		initialize_scan(thread_handler, scans->name);
 		scans = scans->next;
 	}
-	pthread_exit(NULL);
 }
