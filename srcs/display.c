@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/20 04:24:19 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/20 05:10:18 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static void		display_ports(t_queue *queues, char *text)
 		ptr = queues;
 		scan_types = 0;
 		opcl = 0;
-		while (ptr && ptr->port == queues->port) {
+		while (ptr && ptr->port == queues->port && !ft_strcmp(ptr->host, queues->host)) {
 			if (!ft_strcmp(ptr->scan, "SYN")) {
 				scan_types |= 0x0001;
 				if (ptr->filtered)
@@ -206,36 +206,38 @@ static void		sort_open_close(t_queue *head, t_queue **open, t_queue **close)
 
 static t_queue	*sort_by_address(t_queue *queue)
 {
-	t_queue		*head	= queue;
-	t_queue		*tail	= NULL;
+	t_queue		*tail	= queue;
+	t_queue		*end	= NULL;
+	t_queue		*head	= NULL;
+	t_queue		*save	= NULL;
+	t_queue		*ptr	= NULL;
 
-	while (head)
+	while (tail && tail->next)
 	{
-		tail = head;
-		while (tail->next && tail->next->port == head->port)
-			tail = tail->next;
-		while (head != tail)
-		{
-			t_queue		*end	= head;
-			while (end->next && end->next != tail->next && !ft_strcmp(end->next->host, head->host))
-				end = end->next;
-			t_queue		*ptr	= end;
-			while (ptr->next != tail->next)
+		end = tail;
+		while (end->next && end->next->port == tail->port)
+			end = end->next;
+		if (end != tail) {
+			head = tail;
+			while (head->next != end->next && !ft_strcmp(head->next->host, tail->host))
+				head = head->next;
+			ptr = head;
+			while (ptr->next != end->next)
 			{
-				if (!ft_strcmp(ptr->next->host, head->host))
+				if (!ft_strcmp(ptr->next->host, tail->host))
 				{
-					t_queue		*save = ptr->next;
+					save = ptr->next;
 					ptr->next = save->next;
-					save->next = end->next;
-					end->next = save;
-					end = save;
+					save->next = head->next;
+					head->next = save;
+					head = save;
 				}
 				else
 					ptr = ptr->next;
 			}
-			head = end;
+			tail = head;
 		}
-		head = head->next;
+		tail = tail->next;
 	}
 	return (queue);
 }
