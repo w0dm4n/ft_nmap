@@ -127,6 +127,7 @@ typedef struct					s_queue
 **	MAIN
 */
 void				print_start(t_nmap *nmap);
+bool				single_flag(char *flag, bool sub);
 
 /*
 **	INITIALIZER

@@ -14,7 +14,9 @@
 
 static int		main_error(char *str, char *arg)
 {
-	printf("ft_nmap: %s\n", str, arg);
+	printf("ft_nmap: ");
+	printf(str, arg);
+	printf("\n");
 	if (arg)
 		ft_strdel(&arg);
 	free_datas(NULL);
@@ -33,7 +35,8 @@ static void		print_help()
 		   "--deep For scanning all addresses from a given host\n"
 		   "--src Spoof the src address\n"
 		   "--timeout Wait time for host answer (seconds or ms)\n"
-		   "--osscan Scan the host single threaded for guessing the OS\n");
+		   "--osscan Scan the host single threaded for guessing the OS\n"
+		   "--closed Show closed ports too on display\n");
 }
 
 void		print_start(t_nmap *nmap)
@@ -83,6 +86,23 @@ static void		check_help(char **argv)
 	}
 }
 
+bool		single_flag(char *flag, bool sub)
+{
+	char	*tmp = (sub) ? ft_substr(flag, 2, ft_strlen(flag)) : flag;
+	if (!tmp) {
+		return (false);
+	}
+	if (!ft_strcmp(tmp, "osscan") || !ft_strcmp(tmp, "help")
+		|| !ft_strcmp(tmp, "deep") || !ft_strcmp(tmp, "closed")) {
+			if (sub) ft_strdel(&tmp);
+			return (true);
+		}
+	if (sub) {
+		ft_strdel(&tmp);
+	}
+	return (false);
+}
+
 int				main(int argc, char **argv)
 {
 	int			i		= 1;
@@ -98,20 +118,24 @@ int				main(int argc, char **argv)
 	{
 		if ((option = ft_substr(argv[i], 0, 2)) != NULL) {
 			if (ft_strlen(argv[i]) > 2 && !ft_strcmp(option, FLAG_SEPARATOR)) {
-				if (value)
+				if (value) {
 					return main_error("Syntax error !", option);
+				}
 				ft_strdel(&option);
 				if ((option = ft_substr(argv[i], 2, ft_strlen(argv[i]))) != NULL) {
 					if (!get_flag(option)) {
 						add_flag(option);
-						value = true;
+						if (!single_flag(argv[i], true)) {
+							value = true;
+						}
 					}
 					else
 						return main_error("flag %s already set !", option);
 				}
 			} else {
-				if (!add_value(argv[i]))
+				if (!add_value(argv[i])) {
 					return main_error("Syntax error !", option);
+				}
 				value = false;
 			}
 			ft_strdel(&option);

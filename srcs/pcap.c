@@ -25,19 +25,14 @@ void			pcap_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
 		if (queue) {
 			if (!ft_strcmp(queue->scan, "SYN") && tcp_header->syn && tcp_header->ack) {
 				queue->open = true;
-				//printf("SYN SCAN: %d/tcp open (%d)\n", queue->port, ntohs(tcp_header->source));
 			} else if (!ft_strcmp(queue->scan, "ACK") && tcp_header->rst) {
 				queue->filtered = false;
-				//printf("ACK SCAN: %d/tcp unfiltered (%d)\n", queue->port, ntohs(tcp_header->source));
 			} else if (!ft_strcmp(queue->scan, "FIN") && tcp_header->rst) {
 				queue->open = false;
-				//printf("FIN SCAN: %d/tcp closed (%d)\n", queue->port, ntohs(tcp_header->source));
 			} else if (!ft_strcmp(queue->scan, "NULL") && tcp_header->rst && tcp_header->ack) {
 				queue->open = false;
-				//printf("NULL SCAN: %d/tcp closed (%d)\n", queue->port, ntohs(tcp_header->source));
 			} else if (!ft_strcmp(queue->scan, "XMAS") && tcp_header->rst && tcp_header->ack) {
 				queue->open = false;
-				//printf("XMAS SCAN: %d/tcp closed (%d)\n", queue->port, ntohs(tcp_header->source));
 			}
 			queue->done = true;
 		}
@@ -48,7 +43,6 @@ void			pcap_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
 		t_queue *queue = find_queue(IPPROTO_UDP, -1);
 		if (queue) {
 			queue->open = false;
-			//printf("UDP SCAN: %d/udp closed\n", queue->port);
 		}
 	}
     fflush(stdout);

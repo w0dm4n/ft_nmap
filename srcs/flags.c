@@ -60,7 +60,7 @@ bool		add_value(char *value)
 	if (flags) {
 		while (flags)
 		{
-			if (flags->value == NULL) {
+			if (flags->value == NULL && !single_flag(flags->flag, false)) {
 				flags->value = ft_strdup(value);
 				return (true);
 			}
