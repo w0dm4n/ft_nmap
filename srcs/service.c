@@ -1,24 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   generate_id.c                                      :+:      :+:    :+:   */
+/*   service.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/09/18 05:07:18 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/19 02:19:02 by marvin           ###   ########.fr       */
+/*   Created: 2017/09/20 06:32:02 by frmarinh          #+#    #+#             */
+/*   Updated: 2017/09/20 06:32:08 by frmarinh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "all.h"
 
-int		get_id(void)
+char		*get_port_service(int port, u_char proto)
 {
-	static int	id = 59000;
-	int			current_id = 0;
+	char *proto_string = (proto == IPPROTO_TCP) ? "tcp" : "udp";
+	struct servent *appl_name;
 
-	pthread_mutex_lock(&globals->id_lock);
-	current_id = id++;
-	pthread_mutex_unlock(&globals->id_lock);
-	return (current_id);
+	appl_name = getservbyport(htons(port), proto_string);
+	if (appl_name) {
+		return ft_strdup(appl_name->s_name);
+	} else {
+		return (NULL);
+	}
 }

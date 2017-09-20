@@ -103,6 +103,15 @@ bool		single_flag(char *flag, bool sub)
 	return (false);
 }
 
+static bool		init_globals()
+{
+	if (!(globals = (t_global*)malloc(sizeof(struct s_global))))
+		return (false);
+	globals->flags		= NULL;
+	globals->all_queues	= NULL;
+	return (true);
+}
+
 int				main(int argc, char **argv)
 {
 	int			i		= 1;
@@ -114,6 +123,9 @@ int				main(int argc, char **argv)
 		return (0);
 	}
 	check_help(argv);
+	if (!init_globals()){
+		return (-1);
+	}
 	while (i < argc)
 	{
 		if ((option = ft_substr(argv[i], 0, 2)) != NULL) {

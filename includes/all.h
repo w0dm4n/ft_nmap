@@ -45,7 +45,7 @@
 # define DEFAULT_TTL		64
 # define PAYLOAD			""
 # define DEFAULT_INTERFACE	"eth0"
-# define DEFAULT_TIMEOUT	2000
+# define DEFAULT_TIMEOUT	5000
 # define ANSWER_BUFFER		4096
 # define EXECUTION_TIME		3
 
@@ -122,7 +122,16 @@ typedef struct					s_queue
 	int							id;
 	char						*host;
 	struct s_queue				*next;
+	char						*service;
 }								t_queue;
+
+typedef struct					s_global
+{
+	t_flag						*flags;
+	t_queue						*all_queues;
+	pthread_mutex_t				id_lock;
+	pthread_mutex_t				queue_lock;
+}								t_global;
 
 /*
 **	MAIN
@@ -223,10 +232,7 @@ char					*get_pseudo_header(int protohdr_len, void *proto_header, u_char proto, 
 /*
 **  GLOBALS
 */
-t_flag					*g_flags;
-t_queue					*all_queues;
-pthread_mutex_t			id_lock;
-pthread_mutex_t			queue_lock;
+t_global				*globals;
 
 /*
 **  ID
@@ -237,6 +243,12 @@ int						get_id(void);
 **	DISPLAY
 */
 void					init_display(t_nmap *nmap);
+void					display_handler(int sig);
+
+/*
+**	SERVICE
+*/
+char					*get_port_service(int port, u_char proto);
 
 /*
 ** SYN = synchronization

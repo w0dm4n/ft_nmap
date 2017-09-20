@@ -26,7 +26,7 @@ t_flag		*new_flag(char *flag)
 
 t_flag		*get_flags()
 {
-	return (g_flags);
+	return (globals->flags);
 }
 
 t_flag		*get_flag(char *name)
@@ -45,7 +45,7 @@ void		add_flag(char *flag)
 {
 	t_flag		*flags = get_flags();
 	if (!flags) {
-		g_flags = new_flag(flag);
+		globals->flags = new_flag(flag);
 	} else {
 		while (flags->next)
 			flags = flags->next;

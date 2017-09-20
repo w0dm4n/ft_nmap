@@ -59,7 +59,7 @@ static void			wait_answer_queue(t_thread_handler *thread_handler, int port, char
 	if (queue) {
 		add_queue(queue);
 	} else {
-		pthread_mutex_unlock(&queue_lock);
+		pthread_mutex_unlock(&globals->queue_lock);
 	}
 }
 
@@ -81,7 +81,7 @@ void				udp_handler(t_thread_handler *thread_handler, char *scan, char *host)
 					break ;
 				if ((send_socket_raw(thread_handler, raw_len, thread_handler->nmap->port[start_index])) > 0) {
 					wait_answer_queue(thread_handler, thread_handler->nmap->port[start_index], scan, id, host);
-				} else { pthread_mutex_unlock(&queue_lock); }
+				} else { pthread_mutex_unlock(&globals->queue_lock); }
 				ports_len--;
 				start_index++;
 			}

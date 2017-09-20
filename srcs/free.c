@@ -55,6 +55,8 @@ static void		free_queues(t_queue *queue)
 		ft_strdel(&queue->scan);
 	if (queue->host)
 		ft_strdel(&queue->host);
+	if (queue->service)
+		ft_strdel(&queue->service);
 	free(queue);
 }
 
@@ -73,5 +75,5 @@ void			free_datas(t_nmap *nmap)
 		free(nmap);
 	}
 	free_flags(get_flags());
-	free_queues(all_queues);
+	free_queues(globals->all_queues);
 }

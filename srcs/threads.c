@@ -71,6 +71,5 @@ void						instantiate_threads(t_nmap *nmap)
 		i++;
 	}
 	init_pcap(NULL, threads);
-	init_display(nmap);
-	while (true);
+	display_handler(SIGALRM);
 }

@@ -27,38 +27,39 @@ t_queue			*new_queue(int port, u_char proto, char *scan, int id, char *host)
 	new_queue->filtered = true;
 	new_queue->open = false;
 	new_queue->host = ft_strdup(host);
+	new_queue->service = get_port_service(port, proto);
 	return (new_queue);
 }
 
 void			add_queue(t_queue *new_queue)
 {
-	if (all_queues) {
-		t_queue	*tmp = all_queues;
+	if (globals->all_queues) {
+		t_queue	*tmp = globals->all_queues;
 		while (tmp->next)
 			tmp = tmp->next;
 		tmp->next = new_queue;
 	} else {
-		all_queues = new_queue;
+		globals->all_queues = new_queue;
 	}
-	pthread_mutex_unlock(&queue_lock);
+	pthread_mutex_unlock(&globals->queue_lock);
 }
 
 t_queue			*find_queue(u_char proto, int id)
 {
-	pthread_mutex_lock(&queue_lock);
-	t_queue	*tmp = all_queues;
+	pthread_mutex_lock(&globals->queue_lock);
+	t_queue	*tmp = globals->all_queues;
 	while (tmp)
 	{
 		if (id == -1 && tmp->proto == IPPROTO_UDP) {
-			pthread_mutex_unlock(&queue_lock);
+			pthread_mutex_unlock(&globals->queue_lock);
 			return (tmp);
 		}
 		if (tmp->id == id && tmp->proto == proto && !tmp->done) {
-			pthread_mutex_unlock(&queue_lock);
+			pthread_mutex_unlock(&globals->queue_lock);
 			return (tmp);
 		}
 		tmp = tmp->next;
 	}
-	pthread_mutex_unlock(&queue_lock);
+	pthread_mutex_unlock(&globals->queue_lock);
 	return (NULL);
 }

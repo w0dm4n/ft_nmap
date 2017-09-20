@@ -69,7 +69,7 @@ bool			send_socket_raw(t_thread_handler *handler, int raw_len, int port)
 	struct sockaddr_in		sin;
 	struct ip				*ip_header = (struct ip*)((void*)handler->buffer_raw);
 
-	pthread_mutex_lock(&queue_lock);
+	pthread_mutex_lock(&globals->queue_lock);
 	ft_memset (&sin, 0, sizeof(struct sockaddr_in));
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = ip_header->ip_dst.s_addr;
