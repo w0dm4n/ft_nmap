@@ -31,6 +31,47 @@ static bool		check_if_open(t_queue *head)
 	return (is_open);
 }
 
+static int		count_scan_type()
+{
+	t_scan_type		*scans	= globals->nmap->scans;
+	int 			i		= 0;
+	while (scans)
+	{
+		i++;
+		scans = scans->next;
+	}
+	return i;
+}
+
+static char		*ft_dstrjoin(char *s1, char *s2, short flag)
+{
+	char	*result;
+	char	*tmp;
+	char	*pt1;
+	char	*pt2;
+
+	result = NULL;
+	if (s1 == NULL)
+		s1 = ft_strnew(0);
+	pt1 = s1;
+	pt2 = s2;
+	if (s1 && (result = ft_strnew(
+		(ft_strlen(s1) + (s2 != NULL ? ft_strlen(s2) : 0) + 1000))))
+	{
+		tmp = result;
+		while (*s1)
+			*tmp++ = *s1++;
+		while (s2 && *s2)
+			*tmp++ = *s2++;
+		*tmp = '\0';
+	}
+	if ((flag == 1 && pt1) || (flag == 3 && pt1))
+		ft_strdel(&pt1);
+	if ((flag == 2 && pt2) || (flag == 3 && pt2))
+		ft_strdel(&pt2);
+	return (result);
+}
+
 static void		display_ports(t_queue *queues, char *text)
 {
 	t_queue		*ptr		= NULL;
@@ -43,13 +84,16 @@ static void		display_ports(t_queue *queues, char *text)
 	printf(text);
 	print_char(45, '_');
 	printf("\n");
-	printf("PORT\tSERVICE\t\tSCAN TYPE(STATUS)\t\t\tHOST\n");
+	printf("PORT\tSERVICE\t\tSCAN TYPE(STATUS)");
+	int count = count_scan_type();
+	print_char(count * 1.5, '\t');
+	printf("HOST\n");
 	while (queues)
 	{
 		ptr = NULL;
 		printf("%d", queues->port);
 		print_char(1, '\t');
-		printf("%s", queues->service);
+		printf("%-10s", queues->service);
 		print_char(1, '\t');
 
 		ptr = queues;
@@ -91,27 +135,52 @@ static void		display_ports(t_queue *queues, char *text)
 			ptr = ptr->next;
 		}
 
-		int i = 0;
+		int			i = 0;
+		char		*to_print	= ft_strnew(0);
+		char		*tmp		= ft_strnew(0);
 		if (scan_types & 0x0001) {
-			printf(((i == 0) ? "%s" : " %s"), "SYN");
-			printf("(%s)", (opcl & 0x0001 ? "Open" : (filtered & 0x0001 ? "Filtered" : "Closed"))); i++; }
-		if (scan_types & 0x0002) {
-			printf(((i == 0) ? "%s" : " %s"), "NULL");
-			printf("(%s)", ((opcl & 0x0002) ? "Open" : "Closed")); i++; }
-		if (scan_types & 0x0004) {
-			printf(((i == 0) ? "%s" : " %s"), "FIN");
-			printf("(%s)", ((opcl & 0x0004) ? "Open" : "Closed")); i++; }
-		if (scan_types & 0x0008) {
-			printf(((i == 0) ? "%s" : " %s"), "XMAS");
-			printf("(%s)", ((opcl & 0x0008) ? "Open" : "Closed")); i++; }
-		if (scan_types & 0x0010) {
-			printf(((i == 0) ? "%s" : " %s"), "ACK");
-			printf("(%s)", ((opcl & 0x0010) ? "Filtered" : "Unfiltered")); i++; }
-		if (scan_types & 0x0020) {
-			printf(((i == 0) ? "%s" : " %s"), "UDP");
-			printf("(%s)", ((opcl & 0x0020) ? "Open|Filtered" : "Closed")); i++; }
+			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "SYN");
+			to_print = ft_dstrjoin(to_print, tmp, 2);
 
-		print_char((i < 4) ? 4 - i : 1, '\t');
+			asprintf(&tmp, "(%s)", (opcl & 0x0001 ? "Open" : (filtered & 0x0001 ? "Filtered" : "Closed"))); i++;
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+		}
+		if (scan_types & 0x0002) {
+			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "NULL");
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+
+			asprintf(&tmp, "(%s)", ((opcl & 0x0002) ? "Open" : "Closed")); i++;
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+		}
+		if (scan_types & 0x0004) {
+			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "FIN");
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+
+			asprintf(&tmp, "(%s)", ((opcl & 0x0004) ? "Open" : "Closed")); i++;
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+		}
+		if (scan_types & 0x0008) {
+			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "XMAS");
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+
+			asprintf(&tmp, "(%s)", ((opcl & 0x0008) ? "Open" : "Closed")); i++;
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+		}
+		if (scan_types & 0x0010) {
+			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "ACK");
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+			asprintf(&tmp, "(%s)", ((opcl & 0x0010) ? "Filtered" : "Unfiltered")); i++;
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+		}
+		if (scan_types & 0x0020) {
+			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "UDP");
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+
+			asprintf(&tmp, "(%s)", ((opcl & 0x0020) ? "Open|Filtered" : "Closed")); i++;
+			to_print = ft_dstrjoin(to_print, tmp, 2);
+		}
+
+		printf("%-*s", ft_strlen(to_print) + 5, to_print);
 		printf("%s\n", queues->host);
 		queues = ptr;
 	}
@@ -248,6 +317,7 @@ void		display_handler()
 	t_queue		*open_q		= NULL;
 	t_queue		*close_q	= NULL;
 	t_flag		*closed		= get_flag("closed");
+	float		ms_time		= 0;
 
 	queues = sort_by_port(queues);
 	queues = sort_by_address(queues);
@@ -259,6 +329,9 @@ void		display_handler()
 	}
 	if (close_q && closed)
 		display_ports(close_q, "CLOSED_PORTS");
+	ms_time = ((globals->end_time.tv_sec - globals->start_time.tv_sec) * 1000000 + globals->end_time.tv_usec) - globals->start_time.tv_usec;
+	float time_value = ms_time / 1000;
+	printf ("Execution time: %.3fms\n", time_value);
 	free_datas(globals->nmap);
 	exit(0);
 }
@@ -267,6 +340,7 @@ void		init_display(t_nmap *nmap)
 {
 	struct sigaction act;
 
+	gettimeofday (&globals->end_time, NULL);
 	globals->nmap = nmap;
 	ft_memset (&act, 0, sizeof(struct sigaction));
 	act.sa_sigaction = &display_handler;

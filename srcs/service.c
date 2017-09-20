@@ -21,6 +21,6 @@ char		*get_port_service(int port, u_char proto)
 	if (appl_name) {
 		return ft_strdup(appl_name->s_name);
 	} else {
-		return (NULL);
+		return (ft_strdup("Unassigned"));
 	}
 }

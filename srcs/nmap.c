@@ -109,6 +109,7 @@ static bool		init_globals()
 		return (false);
 	globals->flags		= NULL;
 	globals->all_queues	= NULL;
+	gettimeofday (&globals->start_time, NULL);
 	return (true);
 }
 

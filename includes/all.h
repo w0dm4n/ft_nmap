@@ -132,6 +132,7 @@ typedef struct					s_global
 	pthread_mutex_t				id_lock;
 	pthread_mutex_t				queue_lock;
 	struct timeval				start_time;
+	struct timeval				end_time;
 	t_nmap						*nmap;
 }								t_global;
 
@@ -158,7 +159,7 @@ bool				load_ports(t_nmap *nmap);
 /*
 **	GNL
 */
-int				get_next_line(int const fd, char **line);
+int					get_next_line(int const fd, char **line);
 
 /*
 **	SCAN_TYPE

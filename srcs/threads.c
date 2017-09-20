@@ -63,7 +63,6 @@ void						instantiate_threads(t_nmap *nmap)
 	int i = 0, end_diff = 0, total = 0;
 	int ports = nmap->ports_index / nmap->threads;
 
-	gettimeofday (&globals->start_time, NULL);
 	while (i < nmap->threads)
 	{
 		int ports_plus = (i < nmap->threads - nmap->ports_index % nmap->threads) ? 0 : 1;
