@@ -50,7 +50,8 @@ SRCBASE_NMAP	=	\
 					queue.c				\
 					pcap.c				\
 					display.c			\
-					os_scan.c
+					os_scan.c			\
+					service.c
 
 INCS			=	$(addprefix $(INCDIR), $(INCBASE))
 

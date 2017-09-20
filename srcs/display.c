@@ -49,7 +49,7 @@ static void		display_ports(t_queue *queues, char *text)
 		ptr = NULL;
 		printf("%d", queues->port);
 		print_char(1, '\t');
-		printf("Unassigned");
+		printf("%s", queues->service);
 		print_char(1, '\t');
 
 		ptr = queues;
@@ -144,7 +144,7 @@ static t_queue	*sort_by_port(t_queue *head)
 	t_queue		*next;
 	t_queue		*ptr;
 
-	tail = head;	
+	tail = head;
 	while (tail)
 	{
 		next = tail->next;
@@ -242,11 +242,12 @@ static t_queue	*sort_by_address(t_queue *queue)
 	return (queue);
 }
 
-static void		display_handler(int sig)
+void		display_handler()
 {
-	t_queue		*queues		= all_queues;
+	t_queue		*queues		= globals->all_queues;
 	t_queue		*open_q		= NULL;
 	t_queue		*close_q	= NULL;
+	t_flag		*closed		= get_flag("closed");
 
 	queues = sort_by_port(queues);
 	queues = sort_by_address(queues);
@@ -256,13 +257,22 @@ static void		display_handler(int sig)
 		display_ports(open_q, "OPENED_PORTS");
 		printf("\n");
 	}
-	if (close_q)
+	if (close_q && closed)
 		display_ports(close_q, "CLOSED_PORTS");
+	free_datas(globals->nmap);
 	exit(0);
 }
 
-void			init_display(t_nmap *nmap)
+void		init_display(t_nmap *nmap)
 {
-	signal(SIGALRM, display_handler);
+	struct sigaction act;
+
+	globals->nmap = nmap;
+	ft_memset (&act, 0, sizeof(struct sigaction));
+	act.sa_sigaction = &display_handler;
+	act.sa_flags = SA_SIGINFO;
+	if (sigaction(SIGALRM, &act, NULL) < 0) {
+		return ;
+	}
 	alarm(EXECUTION_TIME);
 }

@@ -45,9 +45,9 @@
 # define DEFAULT_TTL		64
 # define PAYLOAD			""
 # define DEFAULT_INTERFACE	"eth0"
-# define DEFAULT_TIMEOUT	5000
+# define DEFAULT_TIMEOUT	2000
 # define ANSWER_BUFFER		4096
-# define EXECUTION_TIME		3
+# define EXECUTION_TIME		5
 
 typedef struct		s_flag
 {
@@ -131,6 +131,8 @@ typedef struct					s_global
 	t_queue						*all_queues;
 	pthread_mutex_t				id_lock;
 	pthread_mutex_t				queue_lock;
+	struct timeval				start_time;
+	t_nmap						*nmap;
 }								t_global;
 
 /*
@@ -242,8 +244,8 @@ int						get_id(void);
 /*
 **	DISPLAY
 */
+void					display_handler();
 void					init_display(t_nmap *nmap);
-void					display_handler(int sig);
 
 /*
 **	SERVICE
