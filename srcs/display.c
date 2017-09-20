@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/20 04:05:48 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/20 04:24:19 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static bool		check_if_open(t_queue *head)
 	return (is_open);
 }
 
-static void		display_ports(t_queue *queues, bool open)
+static void		display_ports(t_queue *queues, char *text)
 {
 	t_queue		*ptr		= NULL;
 	char		*proto		= NULL;
@@ -40,11 +40,7 @@ static void		display_ports(t_queue *queues, bool open)
 	int			filtered	= 0;
 
 	print_char(45, '_');
-	if (open) {
-		printf("OPENED PORTS");
-	} else {
-		printf("CLOSED PORTS");
-	}
+	printf(text);
 	print_char(45, '_');
 	printf("\n");
 	printf("PORT\tSERVICE\t\tSCAN TYPE(STATUS)\t\t\tHOST\n");
@@ -118,6 +114,7 @@ static void		display_ports(t_queue *queues, bool open)
 		print_char((i < 4) ? 4 - i : 1, '\t');
 		printf("%s\n", queues->host);
 		queues = ptr;
+	}
 }
 
 static void		parse_not_done(t_queue *queues)
@@ -220,24 +217,30 @@ static t_queue	*sort_by_address(t_queue *queue)
 		while (head != tail)
 		{
 			t_queue		*end	= head;
-			while (end->next && end->next != tail->next && && !ft_strcmp(end->next->host, head->host))
+			while (end->next && end->next != tail->next && !ft_strcmp(end->next->host, head->host))
 				end = end->next;
 			t_queue		*ptr	= end;
 			while (ptr->next != tail->next)
 			{
 				if (!ft_strcmp(ptr->next->host, head->host))
 				{
-					
-					
+					t_queue		*save = ptr->next;
+					ptr->next = save->next;
+					save->next = end->next;
+					end->next = save;
+					end = save;
 				}
-				ptr = ptr->next;
+				else
+					ptr = ptr->next;
 			}
 			head = end;
 		}
+		head = head->next;
 	}
+	return (queue);
 }
 
-static void		display_handler()
+static void		display_handler(int sig)
 {
 	t_queue		*queues		= all_queues;
 	t_queue		*open_q		= NULL;
@@ -248,15 +251,15 @@ static void		display_handler()
 	parse_not_done(queues);
 	sort_open_close(queues, &open_q, &close_q);
 	if (open_q) {
-		display_ports(open_q, true);
+		display_ports(open_q, "OPENED_PORTS");
 		printf("\n");
 	}
 	if (close_q)
-		display_ports(close_q, false);
+		display_ports(close_q, "CLOSED_PORTS");
 	exit(0);
 }
 
-void			init_display()
+void			init_display(t_nmap *nmap)
 {
 	signal(SIGALRM, display_handler);
 	alarm(EXECUTION_TIME);
