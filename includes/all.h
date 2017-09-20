@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 13:59:36 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/19 03:14:09 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/20 02:37:52 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,14 +120,14 @@ typedef struct					s_queue
 	char						*scan;
 	bool						done;
 	int							id;
-	struct s_queue				*next;
 	char						*host;
+	struct s_queue				*next;
 }								t_queue;
+
 /*
 **	MAIN
 */
 void				print_start(t_nmap *nmap);
-bool				single_flag(char *flag, bool sub);
 
 /*
 **	INITIALIZER
@@ -236,12 +236,8 @@ int						get_id(void);
 /*
 **	DISPLAY
 */
-void					init_display(t_nmap *nmap);
+void					init_display();
 
-/*
-**	OS_SCAN
-*/
-void					init_os_scan(t_nmap *nmap);
 /*
 ** SYN = synchronization
 ** ACK = acknowledged
