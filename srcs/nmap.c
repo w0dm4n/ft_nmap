@@ -32,7 +32,8 @@ static void		print_help()
 		   "--scan SYN/NULL/FIN/XMAS/ACK/UDP\n"
 		   "--deep For scanning all addresses from a given host\n"
 		   "--src Spoof the src address\n"
-		   "--timeout Wait time for host answer (seconds or ms)\n");
+		   "--timeout Wait time for host answer (seconds or ms)\n"
+		   "--osscan Scan the host single threaded for guessing the OS\n");
 }
 
 void		print_start(t_nmap *nmap)
@@ -45,14 +46,15 @@ void		print_start(t_nmap *nmap)
 	} else {
 		printf("\nStarting ft_nmap ( http://nmap.org )\n");
 	}
-	printf("Scan flags: ");
-	while (scans)
-	{
-		printf("%s ", scans->name);
-		scans = scans->next;
+	if (!get_flag("osscan")) {
+		printf("Scan flags: ");
+		while (scans)
+		{
+			printf("%s ", scans->name);
+			scans = scans->next;
+		}
+		printf("\n");
 	}
-	printf("\n");
-	// date in bonus ?
 }
 
 static void		check_help(char **argv)

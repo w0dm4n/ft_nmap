@@ -235,8 +235,12 @@ int						get_id(void);
 /*
 **	DISPLAY
 */
-void					init_display();
+void					init_display(t_nmap *nmap);
 
+/*
+**	OS_SCAN
+*/
+void					init_os_scan(t_nmap *nmap);
 /*
 ** SYN = synchronization
 ** ACK = acknowledged

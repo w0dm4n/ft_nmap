@@ -36,9 +36,10 @@ static t_nmap	*init_nmap()
 
 void			initializer()
 {
-	t_flag		*host = get_flag("host");
-	t_flag		*file = get_flag("file");
-	t_flag		*speed = get_flag("speedup");
+	t_flag		*host	= get_flag("host");
+	t_flag		*file	= get_flag("file");
+	t_flag		*speed	= get_flag("speedup");
+	t_flag		*osscan	= get_flag("osscan");
 	t_nmap		*nmap = NULL;
 	bool		multiple_host = false;
 
@@ -70,7 +71,11 @@ void			initializer()
 			}
 			if (load_hosts(multiple_host, nmap) && load_ports(nmap) && load_scans_type(nmap)) {
 				print_start(nmap);
-				instantiate_threads(nmap);
+				if (!osscan) {
+					instantiate_threads(nmap);
+				} else {
+					init_os_scan(nmap);
+				}
 			}
 		}
 	}

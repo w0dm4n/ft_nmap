@@ -82,8 +82,14 @@ static void				display_handler()
 	exit(0);
 }
 
-void			init_display()
+void			init_display(t_nmap *nmap)
 {
 	signal(SIGALRM, display_handler);
-	alarm(EXECUTION_TIME);
+	if (nmap->ports_index <= 200) {
+		alarm(1);
+	} else if (nmap->ports_index <= 500) {
+		alarm(2);
+	} else {
+		alarm(4);
+	}
 }

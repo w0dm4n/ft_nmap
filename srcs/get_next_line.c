@@ -1,115 +1,103 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: frmarinh <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/07 02:58:19 by frmarinh          #+#    #+#             */
-/*   Updated: 2016/01/07 04:09:38 by frmarinh         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "all.h"
 #include "get_next_line.h"
 
-t_gnl	*alloc_list(t_gnl *list)
+static void		*ft_realloc(void *ptr, size_t size)
 {
-	if (!(list = (t_gnl *)malloc(sizeof(t_gnl))))
-		return (NULL);
-	if (!(list->buffer = (char **)malloc(sizeof(char) * 1024)))
-		return (NULL);
-	list->buffer = ft_set_null(list->buffer);
-	if (!(list->fd = (int *)malloc(sizeof(int))))
-		return (NULL);
-	list->fd[0] = 0;
-	if (!(list->line = (int *)malloc(sizeof(int))))
-		return (NULL);
-	list->line[0] = 0;
-	return (list);
+	void		*out;
+
+	out = malloc(size * 2);
+	ft_memcpy(out, ptr, size);
+	free(ptr);
+	return (out);
 }
 
-t_gnl	*read_fd(int fd, int fd_pos, int res, t_gnl *list)
+static char		*prep_next_line(t_fd_pack *pack, void *newline)
 {
-	char *content;
+	int					offset;
+	char				*out;
 
-	if (!(content = (char *)malloc(sizeof(char) * BUFF_SIZE)))
-		return (NULL);
-	while ((res = read(fd, content, BUFF_SIZE)))
+	offset = newline - (void*)PACK.buf;
+	out = ft_strsub(PACK.buf, 0, offset);
+	ft_memmove(PACK.buf, PACK.buf + offset + 1, PACK.buf_size - offset);
+	PACK.bytes_read = PACK.bytes_read - offset - 1;
+	ft_bzero(PACK.buf + PACK.bytes_read, PACK.buf_size - PACK.bytes_read);
+	PACK.ret_flag = 1;
+	return (out);
+}
+
+static char		*last_line(t_fd_pack *pack)
+{
+	char				*out;
+
+	if (PACK.buf && ft_strlen(PACK.buf))
 	{
-		if (res == -1)
-			return (NULL);
-		list->buffer[fd_pos] = ft_add_in(list->buffer[fd_pos], content, res, 0);
+		out = ft_strsub(PACK.buf, 0, PACK.bytes_read);
+		PACK.buf = NULL;
+		PACK.ret_flag = 1;
+		return (out);
 	}
-	list->line[fd_pos] = 0;
-	free(content);
-	return (list);
+	PACK.fd = -42;
+	return (ft_strdup(""));
 }
 
-t_gnl	*add_fd(t_gnl *list, int const fd)
+static char		*find_next_line(t_fd_pack *pack)
 {
-	int	*new;
-	int	i;
+	int		read_ret;
+	void	*newline;
 
-	i = 1;
-	while (list->fd[i])
-		i++;
-	if (!(new = (int*)malloc(sizeof(int) * (i + 1))))
-		return (NULL);
-	i = 1;
-	while (list->fd[i])
+	newline = NULL;
+	if (PACK.bytes_read && PACK.buf)
+		newline = ft_memchr(PACK.buf, '\n', PACK.bytes_read);
+	while (!newline)
 	{
-		new[i] = list->fd[i];
-		i++;
+		if (PACK.bytes_read + BUFF_SIZE > PACK.buf_size)
+		{
+			PACK.buf = (char*)ft_realloc((void*)PACK.buf, PACK.buf_size);
+			PACK.buf_size *= 2;
+		}
+		read_ret = read(PACK.fd, PACK.buf + PACK.bytes_read, BUFF_SIZE);
+		if (read_ret == 0 || read_ret == -1)
+		{
+			PACK.ret_flag = read_ret;
+			return (read_ret == 0 ? last_line(pack) : NULL);
+		}
+		PACK.bytes_read += read_ret;
+		newline = ft_memchr(PACK.buf, '\n', PACK.bytes_read);
 	}
-	new[i] = fd;
-	list->fd = new;
-	return (list);
+	return (prep_next_line(pack, newline));
 }
 
-char	*get_line(char *buffer, int line, int i, int i_2)
+static void		new_fd(t_fd_pack *pack, int fd)
 {
-	int		line_pos;
-	char	*line_tmp;
-
-	line_pos = 0;
-	while (buffer[i])
-	{
-		if (line_pos == line)
-			break ;
-		if (buffer[i] == '\n')
-			line_pos++;
-		i++;
-	}
-	if (!(line_tmp = (char*)malloc(sizeof(char) * (ft_strlen(buffer) + 1))))
-		return (NULL);
-	while (buffer[i] != '\n' && buffer[i])
-		line_tmp[i_2++] = buffer[i++];
-	line_tmp[i_2] = '\0';
-	return (line_tmp);
+	pack->array[pack->index].fd = fd;
+	pack->array[pack->index].buf_size = BUFF_SIZE;
+	pack->array[pack->index].buf = (char*)malloc(BUFF_SIZE);
 }
 
-int		get_next_line(int const fd, char **line)
+int				get_next_line(const int fd, char **line)
 {
-	static t_gnl	*list;
-	int				fd_position;
-	char			*tmp;
+	static t_fd_pack	files;
 
-	fd_position = 0;
-	if (!line || fd < 3 || !BUFF_SIZE)
+	if (fd < 0 || !line)
 		return (-1);
-	if (!list)
-		if (!(list = alloc_list(list)))
-			return (-1);
-	if (!ft_check_fd(list->fd, fd))
-		list = add_fd(list, fd);
-	fd_position = ft_check_fd(list->fd, fd);
-	if (list->buffer[fd_position] == NULL || !list->buffer[fd_position])
-		if (!(list = read_fd(list->fd[fd_position], fd_position, 0, list)))
-			return (-1);
-	tmp = get_line(list->buffer[fd_position], list->line[fd_position]++, 0, 0);
-	*line = tmp;
-	if ((list->line[fd_position]) >= ft_count_lines(list->buffer[fd_position]))
-		return (0);
-	return (1);
+	files.index = 0;
+	if (files.count)
+	{
+		while (files.index < files.count)
+		{
+			if (FD_PACK.fd == fd)
+				break ;
+			if (++files.index == files.count)
+			{
+				files.count++;
+				new_fd(&files, fd);
+			}
+		}
+	}
+	else
+	{
+		files.count = 1;
+		new_fd(&files, fd);
+	}
+	*line = find_next_line(&files);
+	return (FD_PACK.ret_flag);
 }

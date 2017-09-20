@@ -1,29 +1,29 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: frmarinh <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/17 08:18:11 by frmarinh          #+#    #+#             */
-/*   Updated: 2015/12/17 08:18:13 by frmarinh         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
+# define BUFF_SIZE 8
+# define MAX_FD_COUNT 1024
+# define FD_PACK files.array[files.index]
+# define PACK pack->array[pack->index]
 # include <sys/types.h>
 # include <sys/uio.h>
-# include <unistd.h>
-# include <fcntl.h>
-# define BUFF_SIZE 512
+# include <libft.h>
 
-int					get_next_line(int const fd, char **line);
-
-typedef struct		s_gnl
+typedef	struct	s_fdbuf
 {
-	char		**buffer;
-	int			*fd;
-	int			*line;
-}					t_gnl;
+	int			fd;
+	size_t		bytes_read;
+	size_t		buf_size;
+	int			ret_flag;
+	char		*buf;
+}				t_fdbuf;
+
+typedef	struct	s_fd_pack
+{
+	t_fdbuf		array[MAX_FD_COUNT];
+	int			index;
+	int			count;
+}				t_fd_pack;
+
+int				get_next_line(const int fd, char **line);
+
 #endif
