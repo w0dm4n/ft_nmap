@@ -119,6 +119,10 @@ int				main(int argc, char **argv)
 	bool		value	= false;
 	char		*option	= NULL;
 
+	if (getuid()) {
+		printf("You need to be root to use ft_nmap !\n");
+		return (0);
+	}
 	if (argc == 1) {
 		print_help();
 		return (0);
