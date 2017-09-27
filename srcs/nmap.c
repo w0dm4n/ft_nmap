@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 12:51:06 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/25 20:56:45 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/27 22:14:37 by frmarinh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,10 @@ int				main(int argc, char **argv)
 	bool		value	= false;
 	char		*option	= NULL;
 
+	if (getuid()) {
+		printf("You need to be root to use ft_nmap !\n");
+		return (0);
+	}
 	if (argc == 1) {
 		print_help();
 		return (0);
