@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/25 21:12:46 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/29 00:17:37 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -347,12 +347,10 @@ void		display_handler()
 	exit(0);
 }
 
-void		init_display(t_nmap *nmap)
+void		init_display()
 {
 	struct sigaction act;
 
-	gettimeofday (&globals->end_time, NULL);
-	globals->nmap = nmap;
 	ft_memset (&act, 0, sizeof(struct sigaction));
 	act.sa_sigaction = &display_handler;
 	act.sa_flags = SA_SIGINFO;

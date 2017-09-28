@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 12:51:06 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/27 22:14:37 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/29 00:20:36 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,6 @@ static bool		init_globals()
 		return (false);
 	globals->flags		= NULL;
 	globals->all_queues	= NULL;
-	gettimeofday (&globals->start_time, NULL);
 	return (true);
 }
 

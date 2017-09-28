@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 13:59:36 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/25 19:48:06 by marvin           ###   ########.fr       */
+/*   Updated: 2017/09/29 00:17:55 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,7 +248,7 @@ int						get_id(void);
 **	DISPLAY
 */
 void					display_handler();
-void					init_display(t_nmap *nmap);
+void					init_display();
 
 /*
 **	SERVICE

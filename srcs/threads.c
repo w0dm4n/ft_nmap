@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/12 18:27:05 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/27 22:11:15 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/09/29 00:20:40 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ void						instantiate_threads(t_nmap *nmap)
 	int i = 0, end_diff = 0, total = 0;
 	int ports = nmap->ports_index / nmap->threads;
 
+	gettimeofday (&globals->start_time, NULL);
 	while (i < nmap->threads)
 	{
 		int ports_plus = (i < nmap->threads - nmap->ports_index % nmap->threads) ? 0 : 1;
@@ -70,7 +71,9 @@ void						instantiate_threads(t_nmap *nmap)
 		total += ports + ports_plus;
 		i++;
 	}
+	init_display();
 	init_pcap(NULL, threads);
-	init_display(nmap);
+	gettimeofday (&globals->end_time, NULL);
+	globals->nmap = nmap;
 	while (true);
 }
