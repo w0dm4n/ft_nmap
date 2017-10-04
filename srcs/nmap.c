@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 12:51:06 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/29 00:20:36 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2017/09/27 22:14:37 by frmarinh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,7 @@ static void		print_help()
 		   "--file File name containing IP addresses to scan,\n"
 		   "--speedup [250 max] number of parallel threads to use\n"
 		   "--scan SYN/NULL/FIN/XMAS/ACK/UDP\n"
-		   "--deep For scanning all addresses from a given host\n"
-		   "--src Spoof the src address\n"
+		   "--spoof Spoof the src address\n"
 		   "--timeout Wait time for host answer (seconds or ms)\n"
 		   "--osscan Scan the host single threaded for guessing the OS\n"
 		   "--closed Show closed ports too on display\n");
