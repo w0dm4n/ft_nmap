@@ -331,7 +331,7 @@ void		display_handler()
 	float		ms_time		= 0;
 
 	queues = sort_by_port(queues);
-	queues = sort_by_address(queues);
+	//queues = sort_by_address(queues);
 	parse_not_done(queues);
 	sort_open_close(queues, &open_q, &close_q);
 	if (open_q) {
