@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/25 21:12:46 by marvin           ###   ########.fr       */
+/*   Updated: 2017/10/04 23:20:26 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,37 +44,56 @@ static int		count_scan_type()
 	return i;
 }
 
-static char		*ft_dstrjoin(char *s1, char *s2, short flag)
+static char		*leaks_free_strjoin(char *s1, char *s2)
 {
-	char	*result;
-	char	*tmp;
-	char	*pt1;
-	char	*pt2;
+	char		*ret;
+	size_t		i = 0;
+	size_t		j = 0;
 
-	result = NULL;
-	if (s1 == NULL)
-		s1 = ft_strnew(0);
-	pt1 = s1;
-	pt2 = s2;
-	if (s1 && (result = ft_strnew(
-		(ft_strlen(s1) + (s2 != NULL ? ft_strlen(s2) : 0) + 1000))))
-	{
-		tmp = result;
-		while (*s1)
-			*tmp++ = *s1++;
-		while (s2 && *s2)
-			*tmp++ = *s2++;
-		*tmp = '\0';
+	while (s1 && s1[i])
+		i++;
+	while (s2 && s2[j])
+		j++;
+	if ((ret = (char *)malloc(sizeof(*ret) * (i + j + 1))) == NULL)
+		return (NULL);
+	i = 0;
+	while (s1 && s1[i]) {
+		ret[i] = s1[i];
+		i++;
 	}
-	if ((flag == 1 && pt1) || (flag == 3 && pt1))
-		ft_strdel(&pt1);
-	if ((flag == 2 && pt2) || (flag == 3 && pt2))
-		ft_strdel(&pt2);
-	return (result);
+	j = 0;
+	while (s2 && s2[j]) {
+		ret[i + j] = s2[j];
+		j++;
+	}
+	ret[i + j] = '\0';
+	if (s1)
+		free(s1);
+	if (s2)
+		free(s2);
+	return (ret);
+}
+
+static void		my_asprintf(char **str, char *dup, int space)
+{
+	char		*ptr;
+	size_t		len = ft_strlen(dup) + space + 1;
+
+	*str = (char *)malloc(sizeof(**str) * len);
+	if (*str) {
+		ptr = *str;
+		if (space)
+			*ptr++ = ' ';
+		while (*dup)
+			*ptr++ = *dup++;
+	}
+	*ptr = '\0';
 }
 
 static void		display_ports(t_queue *queues, char *text)
 {
+	static char	*scan_name[] = { "SYN", "NULL", "FIN", "XMAS", "ACK", "UDP", NULL };
+	static int	scan_value[] = { 0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0000 };
 	t_queue		*ptr		= NULL;
 	char		*proto		= NULL;
 	int			scan_types	= 0;
@@ -100,99 +119,47 @@ static void		display_ports(t_queue *queues, char *text)
 		ptr = queues;
 		scan_types = 0;
 		opcl = 0;
+		int i = 0;
 		while (ptr && ptr->port == queues->port && !ft_strcmp(ptr->host, queues->host)) {
-			if (!ft_strcmp(ptr->scan, "SYN")) {
-				scan_types |= 0x0001;
-				if (ptr->filtered)
-					filtered |= 0x0001;
-				else if (ptr->open)
-					opcl |= 0x0001;
+			while (scan_name[i]) {
+				if (!ft_strcmp(ptr->scan, scan_name[i])) {
+					scan_types |= scan_value[i];
+					if (ptr->filtered)
+						filtered |= scan_value[i];
+					else if (ptr->open)
+						opcl |= scan_value[i];
+					break ;
+				}
+				i++;
 			}
-			else if (!ft_strcmp(ptr->scan, "NULL")) {
-				scan_types |= 0x0002;
-				if (ptr->filtered)
-					filtered |= 0x0002;
-				else if (ptr->open)
-					opcl |= 0x0002;
-			}
-			else if (!ft_strcmp(ptr->scan, "FIN")) {
-				scan_types |= 0x0004;
-				if (ptr->filtered)
-					filtered |= 0x0004;
-				else if (ptr->open)
-					opcl |= 0x0004;
-			}
-			else if (!ft_strcmp(ptr->scan, "XMAS")) {
-				scan_types |= 0x0008;
-				if (ptr->filtered)
-					filtered |= 0x0008;
-				else if (ptr->open)
-					opcl |= 0x0008;
-			}
-			else if (!ft_strcmp(ptr->scan, "ACK")) {
-				scan_types |= 0x0010;
-				if (ptr->filtered)
-					filtered |= 0x0010;
-				else if (ptr->open)
-					opcl |= 0x0010;
-			}
-			else if (!ft_strcmp(ptr->scan, "UDP")) {
-				scan_types |= 0x0020;
-				if (ptr->filtered)
-					filtered |= 0x0020;
-				else if (ptr->open)
-					opcl |= 0x0020;
-			}
+			i = 0;
 			ptr = ptr->next;
 		}
 
-		int			i = 0;
-		char		*to_print	= ft_strnew(0);
-		char		*tmp		= ft_strnew(0);
-		if (scan_types & 0x0001) {
-			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "SYN");
-			to_print = ft_dstrjoin(to_print, tmp, 2);
+		int			pos = 0;
+		char		*p1 = NULL;
+		char		*p2 = NULL;
+		char		*p3 = NULL;
+		char		*ret = NULL;
 
-			asprintf(&tmp, "(%s)", (opcl & 0x0001 ? "Open" : (filtered & 0x0001 ? "Filtered" : "Closed"))); i++;
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-		}
-		if (scan_types & 0x0002) {
-			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "NULL");
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-
-			asprintf(&tmp, "(%s)", ((opcl & 0x0002) ? "Open" : (filtered & 0x0002 ? "Filtered" : "Closed"))); i++;
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-		}
-		if (scan_types & 0x0004) {
-			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "FIN");
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-
-			asprintf(&tmp, "(%s)", ((opcl & 0x0004) ? "Open" : (filtered & 0x0004 ? "Filtered" : "Closed"))); i++;
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-		}
-		if (scan_types & 0x0008) {
-			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "XMAS");
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-
-			asprintf(&tmp, "(%s)", ((opcl & 0x0008) ? "Open" : (filtered & 0x0008 ? "Filtered" : "Closed"))); i++;
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-		}
-		if (scan_types & 0x0010) {
-			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "ACK");
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-			asprintf(&tmp, "(%s)", ((opcl & 0x0010) ? "Filtered" : "Unfiltered")); i++;
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-		}
-		if (scan_types & 0x0020) {
-			asprintf(&tmp, ((i == 0) ? "%s" : " %s"), "UDP");
-			to_print = ft_dstrjoin(to_print, tmp, 2);
-
-			asprintf(&tmp, "(%s)", ((opcl & 0x0020) ? "Open" : (filtered & 0x0020 ? "Filtered" : "Closed"))); i++;
-			to_print = ft_dstrjoin(to_print, tmp, 2);
+		i = 0;
+		while (scan_name[i]) {
+			if (scan_types & scan_value[i]) {
+				my_asprintf(&p1, scan_name[i], pos);
+				my_asprintf(&p2, (opcl & scan_value[i] ? "(Open)" :
+								  (filtered & scan_value[i] ? "(Filtered)" : "(Closed)")), 0);
+				pos = 1;
+				p3 = leaks_free_strjoin(p1, p2);
+				p1 = ret;
+				ret = leaks_free_strjoin(p1, p3);
+			}
+			i++;
 		}
 
-		printf("%-*s", ft_strlen(to_print) + 5, to_print);
+		printf("%-*s", ft_strlen(ret) + 5, ret);
 		printf("%s\n", queues->host);
+		if (ret)
+			free(ret);
 		queues = ptr;
 	}
 }
@@ -331,7 +298,7 @@ void		display_handler()
 	float		ms_time		= 0;
 
 	queues = sort_by_port(queues);
-	//queues = sort_by_address(queues);
+//	queues = sort_by_address(queues);
 	parse_not_done(queues);
 	sort_open_close(queues, &open_q, &close_q);
 	if (open_q) {
@@ -358,8 +325,10 @@ void		init_display(t_nmap *nmap)
 	act.sa_sigaction = &display_handler;
 	act.sa_flags = SA_SIGINFO;
 	if (sigaction(SIGALRM, &act, NULL) < 0) {
-		return ;
+		exit(0);
 	}
-	printf("Sniffing network for %d ms.. and waiting for answers (%ds)\n", (timeout && timeout->value) ? ft_atoi(timeout->value) : DEFAULT_TIMEOUT, EXECUTION_TIME);
+	printf("Sniffing network for %d ms.. and waiting for answers (%ds)\n",
+			(timeout && timeout->value) ? ft_atoi(timeout->value) : DEFAULT_TIMEOUT,
+			EXECUTION_TIME);
 	alarm(EXECUTION_TIME);
 }
