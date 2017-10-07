@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/07 19:53:06 by root             ###   ########.fr       */
+/*   Updated: 2017/10/07 21:13:30 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,13 +95,9 @@ static int		calc_underscore_length(int count, char *text)
 	int			underscore;
 
 	underscore = (TAB_WIDTH > 4) ? 5 + TAB_WIDTH % 5 : 5 + 5 % TAB_WIDTH;
-	printf("%d ", underscore);
 	underscore += (10 + TAB_WIDTH - 10 / TAB_WIDTH);
-	printf("%d ", underscore);
 	underscore += (count > 1) ? ((count * 15 + TAB_WIDTH - (count * 15) / TAB_WIDTH)) : (17 + TAB_WIDTH - 17 / TAB_WIDTH);
-	printf("%d ", underscore);
 	underscore += (15 - ft_strlen(text));
-	printf("%d ", underscore);
 	underscore /= 2;
 	return (underscore);
 }
@@ -128,10 +124,6 @@ static void		display_ports(t_queue *queues, char *text)
 	printf("%-15s\n", "HOST");
 	while (queues)
 	{
-		ptr = NULL;
-		printf("%-5d\t", queues->port);
-		printf("%-10s\t", queues->service);
-
 		ptr = queues;
 		scan_types = 0;
 		opcl = 0;
@@ -156,7 +148,7 @@ static void		display_ports(t_queue *queues, char *text)
 		char		*p1 = NULL;
 		char		*p2 = NULL;
 		char		*p3 = NULL;
-		char		*ret = NULL;
+		char		*scans = NULL;
 		i = 0;
 		while (scan_name[i]) {
 			if (scan_types & scan_value[i]) {
@@ -165,16 +157,18 @@ static void		display_ports(t_queue *queues, char *text)
 								  (filtered & scan_value[i] ? "(Filtered)" : "(Closed)")), 0);
 				pos = 1;
 				p3 = leaks_free_strjoin(p1, p2);
-				p1 = ret;
-				ret = leaks_free_strjoin(p1, p3);
+				p1 = scans;
+				scans = leaks_free_strjoin(p1, p3);
 			}
 			i++;
 		}
 
-		printf("%-17s\t", ret);
+		printf("%-5d\t", queues->port);
+		printf("%-10s\t", queues->service);
+		printf("%-17s\t", scans);
 		printf("%-15s\n", queues->host);
-		if (ret)
-			free(ret);
+		if (scans)
+			free(scans);
 		queues = ptr;
 	}
 }
@@ -210,7 +204,9 @@ static void		sort_open_close(t_queue *head, t_queue **open, t_queue **close)
 	{
 		is_open = head->open && !head->filtered;
 		tail = head;
-		while (tail->next && tail->next->port == head->port)
+		while (tail->next &&
+				tail->next->port == head->port &&
+				!ft_strcmp(tail->next->host, head->host))
 		{
 			if (!is_open)
 				is_open = tail->next->open && !tail->next->filtered;
@@ -320,7 +316,7 @@ void		display_handler()
 	t_flag		*closed		= get_flag("closed");
 	float		ms_time		= 0;
 
-	pthread_mutex_lock(&globals->id_lock);
+//	pthread_mutex_lock(&globals->id_lock);
 	queues = sort_by_port(queues);
 	queues = sort_by_address(queues);
 	parse_not_done(queues);
@@ -333,7 +329,7 @@ void		display_handler()
 	float time_value = ms_time / 1000;
 	printf ("Execution time: %.3fms\n", time_value);
 	free_datas(globals->nmap);
-	pthread_mutex_unlock(&globals->id_lock);
+//	pthread_mutex_unlock(&globals->id_lock);
 	exit(0);
 }
 

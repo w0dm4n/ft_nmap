@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 13:59:36 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/07 19:21:34 by root             ###   ########.fr       */
+/*   Updated: 2017/10/07 20:58:16 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,9 @@
 # define DEFAULT_TTL		64
 # define PAYLOAD			""
 # define DEFAULT_INTERFACE	"eth0"
-//# define DEFAULT_INTERFACE	"lo"
 # define DEFAULT_TIMEOUT	2000
 # define ANSWER_BUFFER		4096
-# define EXECUTION_TIME		2
+# define EXECUTION_TIME		1
 # define TAB_WIDTH			8
 
 typedef struct		s_flag
@@ -59,7 +58,7 @@ typedef struct		s_flag
 }					t_flag;
 
 /*
-    96 bit (12 bytes) pseudo header needed for tcp header checksum calculation
+**  96 bit (12 bytes) pseudo header needed for tcp header checksum calculation
 */
 struct pseudo_header
 {

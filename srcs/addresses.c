@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/04 16:02:03 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/04 16:02:07 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/10/07 21:20:57 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,9 @@ static char			**get_host_addresses(struct hostent *host)
 			IP.s_addr = *((uint32_t*) host->h_addr_list[i]);
 			if ((tmp_host = inet_ntoa(IP)) != NULL) {
 				hosts[i] = ft_strdup(tmp_host);
+			} else {
+				ft_free_array((void **)hosts);
+				return (NULL);
 			}
 			i++;
 		}
