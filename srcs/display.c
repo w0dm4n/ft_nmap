@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/07 12:33:35 by root             ###   ########.fr       */
+/*   Updated: 2017/10/07 12:36:44 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ static void		display_ports(t_queue *queues, char *text)
 	printf("\n");
 	printf("PORT\tSERVICE\t\tSCAN TYPE(STATUS)");
 	int count = count_scan_type();
-	print_char(count * 1.6, '\t');
+	print_char(count * 1.7, '\t');
 	printf("HOST\n");
 	while (queues)
 	{
