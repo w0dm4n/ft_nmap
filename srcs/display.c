@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/04 23:20:26 by root             ###   ########.fr       */
+/*   Updated: 2017/10/07 12:05:07 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,41 +185,6 @@ static void		parse_not_done(t_queue *queues)
 	}
 }
 
-static t_queue	*sort_by_port(t_queue *head)
-{
-	t_queue		*tail;
-	t_queue		*next;
-	t_queue		*ptr;
-
-	tail = head;
-	while (tail)
-	{
-		next = tail->next;
-		if (next && next->port < tail->port)
-		{
-			if (next->port < head->port) {
-				tail->next = next->next;
-				next->next = head;
-				head = next;
-			} else {
-				ptr = head;
-				while (ptr->next && ptr != next) {
-					if (next->port < ptr->next->port) {
-						tail->next = next->next;
-						next->next = ptr->next;
-						ptr->next = next;
-						break ;
-					}
-					ptr = ptr->next;
-				}
-			}
-		}
-		else
-			tail = tail->next;
-	}
-	return head;
-}
-
 static void		sort_open_close(t_queue *head, t_queue **open, t_queue **close)
 {
 	t_queue		*tail = head;
@@ -251,6 +216,43 @@ static void		sort_open_close(t_queue *head, t_queue **open, t_queue **close)
 	}
 }
 
+static t_queue	*sort_by_port(t_queue *head)
+{
+	t_queue		*first	= head;
+	t_queue		*ptr	= NULL;
+
+	while (head)
+	{
+		if (head->next && head->next->port < head->port)
+		{
+			/* If the next port is lower than the first one */
+			if (head->next->port < first->port) {
+				ptr = head->next;
+				head->next = ptr->next;
+				ptr->next = first;
+				head = ptr;
+				first = ptr;
+			} else {
+				/* Else we check from the first */
+				ptr = first;
+				while (ptr->next && ptr != head->next) {
+					if (head->next->port < ptr->next->port) {
+						t_queue *swap = head->next;
+						head->next = swap->next;
+						swap->next = ptr->next;
+						ptr->next = swap;
+						break ;
+					}
+					ptr = ptr->next;
+				}
+			}
+		}
+		else
+			head = head->next;
+	}
+	return first;
+}
+
 static t_queue	*sort_by_address(t_queue *queue)
 {
 	t_queue		*tail	= queue;
@@ -261,18 +263,24 @@ static t_queue	*sort_by_address(t_queue *queue)
 
 	while (tail && tail->next)
 	{
+		/* We get the range (tail to end) of the queues who got the same port */
 		end = tail;
 		while (end->next && end->next->port == tail->port)
 			end = end->next;
+		/* if we got a range > 1 */
 		if (end != tail) {
+			/* We get the range (tail to head) of the queue who got the same host */
 			head = tail;
 			while (head->next != end->next && !ft_strcmp(head->next->host, tail->host))
 				head = head->next;
+			/* We now loop througth the port range */
 			ptr = head;
-			while (ptr->next != end->next)
+			while (ptr->next && ptr->next != end->next)
 			{
+				/* If our pointeur host equals our tail host, */
 				if (!ft_strcmp(ptr->next->host, tail->host))
 				{
+					/* We swap pointeurs so the same hosts are next to each others */
 					save = ptr->next;
 					ptr->next = save->next;
 					save->next = head->next;
@@ -297,8 +305,10 @@ void		display_handler()
 	t_flag		*closed		= get_flag("closed");
 	float		ms_time		= 0;
 
+//	pthread_mutex_lock(&globals->id_lock);
 	queues = sort_by_port(queues);
-//	queues = sort_by_address(queues);
+	int i = 0;
+	queues = sort_by_address(queues);
 	parse_not_done(queues);
 	sort_open_close(queues, &open_q, &close_q);
 	if (open_q) {
@@ -307,10 +317,12 @@ void		display_handler()
 	}
 	if (close_q && closed)
 		display_ports(close_q, "CLOSED_PORTS");
+		;
 	ms_time = ((globals->end_time.tv_sec - globals->start_time.tv_sec) * 1000000 + globals->end_time.tv_usec) - globals->start_time.tv_usec;
 	float time_value = ms_time / 1000;
 	printf ("Execution time: %.3fms\n", time_value);
 	free_datas(globals->nmap);
+//	pthread_mutex_unlock(&globals->id_lock);
 	exit(0);
 }
 

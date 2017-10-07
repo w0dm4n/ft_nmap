@@ -6,7 +6,7 @@
 #    By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/05/20 17:57:50 by frmarinh          #+#    #+#              #
-#    Updated: 2017/09/18 04:57:47 by frmarinh         ###   ########.fr        #
+#    Updated: 2017/10/07 12:07:46 by root             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -99,10 +99,12 @@ NMAP: $(OBJDIR_NMAP) $(OBJS_NMAP)
 
 clean:
 	@rm -rf $(OBJDIR_NMAP)
+	@make -C $(LIBFT_DIR) clean
 	echo "\r\033[38;5;124m📕  CLEAN $(OBJDIR_NMAP)\033[0m\033[K";
 
 fclean:		clean
 	@rm -rf $(NAME_NMAP)
+	@make -C $(LIBFT_DIR) fclean
 	echo "\r\033[38;5;124m📕  FCLEAN $(NAME_NMAP)\033[0m\033[K";
 
 -include $(OBJS:.o=.d)
