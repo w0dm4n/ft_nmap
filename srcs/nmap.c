@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 12:51:06 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/27 22:14:37 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/10/07 20:03:23 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,8 +117,7 @@ static bool		init_globals()
 {
 	if (!(globals = (t_global*)malloc(sizeof(struct s_global))))
 		return (false);
-	globals->flags		= NULL;
-	globals->all_queues	= NULL;
+	ft_memset(globals, 0, sizeof(*globals));
 	return (true);
 }
 
