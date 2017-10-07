@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 16:08:20 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/19 01:26:26 by root             ###   ########.fr       */
+/*   Updated: 2017/10/07 21:43:40 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,10 @@ bool			load_hosts(bool multiple_host, t_nmap *nmap)
 			return false;
 		}
 		while (get_next_line(fd, &hosts) > 0) {
-			nmap->hosts = add_host(nmap->hosts, hosts);
+			if (hosts && *hosts && *hosts != '#')
+				nmap->hosts = add_host(nmap->hosts, hosts);
+			else
+				free(hosts);
 		}
 		close(fd);
 	}

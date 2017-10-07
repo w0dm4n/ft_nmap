@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 13:59:36 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/07 20:58:16 by root             ###   ########.fr       */
+/*   Updated: 2017/10/07 22:37:32 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@
 # define DEFAULT_INTERFACE	"eth0"
 # define DEFAULT_TIMEOUT	2000
 # define ANSWER_BUFFER		4096
-# define EXECUTION_TIME		1
+# define EXECUTION_TIME		16
 # define TAB_WIDTH			8
 
 typedef struct		s_flag
