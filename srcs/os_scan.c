@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/20 01:46:03 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/25 19:47:54 by marvin           ###   ########.fr       */
+/*   Updated: 2017/10/04 21:35:36 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ static void			recv_msg(int fd)
 		if (tcp_header->rst) {
 			printf("OS: WINDOWS\n");
 		} else {
-			 printf("Unkown OS type\n");
+			printf("Unkown OS type\n");
 		 }
 	} else {
 		printf("OS: UNIX (or cant guess)\n");

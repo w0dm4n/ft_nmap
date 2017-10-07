@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 13:59:36 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/25 19:48:06 by marvin           ###   ########.fr       */
+/*   Updated: 2017/10/07 12:13:31 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,10 @@
 # define DEFAULT_TTL		64
 # define PAYLOAD			""
 # define DEFAULT_INTERFACE	"eth0"
+//# define DEFAULT_INTERFACE	"lo"
 # define DEFAULT_TIMEOUT	2000
 # define ANSWER_BUFFER		4096
-# define EXECUTION_TIME		5
+# define EXECUTION_TIME		7
 
 typedef struct		s_flag
 {

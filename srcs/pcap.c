@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/16 04:38:55 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/25 21:06:31 by marvin           ###   ########.fr       */
+/*   Updated: 2017/10/07 11:47:44 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void			pcap_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
 	int i = 0;
 	bytes += 14; // link layer header
 	struct ip	*header = (struct ip*)bytes;
+
 	if (header->ip_p == IPPROTO_TCP) {
 		struct tcphdr			*tcp_header		= (struct tcphdr*)((void*)bytes + sizeof(struct ip));
 		int						id				= ntohs(tcp_header->dest);

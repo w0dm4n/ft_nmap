@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/12 16:45:32 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/09/12 16:45:38 by frmarinh         ###   ########.fr       */
+/*   Updated: 2017/10/04 21:54:34 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,17 @@ static bool				valid_scan_type(t_scan_type *scans, char *type)
 	return (false);
 }
 
+static void				free_scan_type(t_scan_type *scan)
+{
+	if (!scan)
+		return ;
+	if (scan->next)
+		free_scan_type(scan->next);
+	if (scan->name)
+		ft_strdel(&scan->name);
+	free(scan);
+}
+
 bool					load_scans_type(t_nmap *nmap)
 {
 	t_scan_type		*scans = get_all_scans_type();
@@ -80,6 +91,7 @@ bool					load_scans_type(t_nmap *nmap)
 					}
 					i++;
 				}
+				ft_free_array((void **)types);
 			}
 		}
 		nmap->scans = (customs) ? customs : scans;
