@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/07 12:05:07 by root             ###   ########.fr       */
+/*   Updated: 2017/10/07 12:33:35 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,13 +100,14 @@ static void		display_ports(t_queue *queues, char *text)
 	int			opcl		= 0;
 	int			filtered	= 0;
 
+	printf("\n");
 	print_char(45, '_');
-	printf(text);
+	printf("%s", text);
 	print_char(45, '_');
 	printf("\n");
 	printf("PORT\tSERVICE\t\tSCAN TYPE(STATUS)");
 	int count = count_scan_type();
-	print_char(count * 1.5, '\t');
+	print_char(count * 1.6, '\t');
 	printf("HOST\n");
 	while (queues)
 	{
@@ -156,7 +157,8 @@ static void		display_ports(t_queue *queues, char *text)
 			i++;
 		}
 
-		printf("%-*s", ft_strlen(ret) + 5, ret);
+		printf("%s", ret);
+		print_char((ft_strlen(ret) % 8 > 2) ? 2 : 1, '\t');
 		printf("%s\n", queues->host);
 		if (ret)
 			free(ret);
@@ -307,17 +309,13 @@ void		display_handler()
 
 //	pthread_mutex_lock(&globals->id_lock);
 	queues = sort_by_port(queues);
-	int i = 0;
 	queues = sort_by_address(queues);
 	parse_not_done(queues);
 	sort_open_close(queues, &open_q, &close_q);
-	if (open_q) {
+	if (open_q)
 		display_ports(open_q, "OPENED_PORTS");
-		printf("\n");
-	}
 	if (close_q && closed)
 		display_ports(close_q, "CLOSED_PORTS");
-		;
 	ms_time = ((globals->end_time.tv_sec - globals->start_time.tv_sec) * 1000000 + globals->end_time.tv_usec) - globals->start_time.tv_usec;
 	float time_value = ms_time / 1000;
 	printf ("Execution time: %.3fms\n", time_value);
