@@ -6,7 +6,7 @@
 #    By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/05/20 17:57:50 by frmarinh          #+#    #+#              #
-#    Updated: 2017/10/07 12:07:46 by root             ###   ########.fr        #
+#    Updated: 2017/10/07 17:54:14 by root             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ NAMEBASE    =   $(shell basename $(NAME))
 LENGTHNAME	=	`printf "%s" $(NAMEBASE) | wc -c`
 MAX_COLS	=	$$(echo "$$(tput cols)-24-$(LENGTHNAME)"|bc)
 
-CC			=	gcc -ggdb -lpthread -lpcap
+CC			=	gcc -ggdb -lpthread -lpcap -std=gnu99
 FLAGS_O		=
 
 SRCDIR_NMAP		=	srcs/
