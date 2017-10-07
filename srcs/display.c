@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/07 12:36:44 by root             ###   ########.fr       */
+/*   Updated: 2017/10/07 12:59:23 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,14 +99,15 @@ static void		display_ports(t_queue *queues, char *text)
 	int			scan_types	= 0;
 	int			opcl		= 0;
 	int			filtered	= 0;
+	int			count		= count_scan_type();
+	int			underscore	= (ft_strlen(text) + 26 + count * 14) / 2;
 
 	printf("\n");
-	print_char(45, '_');
+	print_char(underscore, '_');
 	printf("%s", text);
-	print_char(45, '_');
+	print_char(underscore, '_');
 	printf("\n");
 	printf("PORT\tSERVICE\t\tSCAN TYPE(STATUS)");
-	int count = count_scan_type();
 	print_char(count * 1.7, '\t');
 	printf("HOST\n");
 	while (queues)
