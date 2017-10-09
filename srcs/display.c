@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 07:01:52 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/07 12:59:23 by root             ###   ########.fr       */
+/*   Updated: 2017/10/07 21:13:30 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,18 @@ static void		my_asprintf(char **str, char *dup, int space)
 	*ptr = '\0';
 }
 
+static int		calc_underscore_length(int count, char *text)
+{
+	int			underscore;
+
+	underscore = (TAB_WIDTH > 4) ? 5 + TAB_WIDTH % 5 : 5 + 5 % TAB_WIDTH;
+	underscore += (10 + TAB_WIDTH - 10 / TAB_WIDTH);
+	underscore += (count > 1) ? ((count * 15 + TAB_WIDTH - (count * 15) / TAB_WIDTH)) : (17 + TAB_WIDTH - 17 / TAB_WIDTH);
+	underscore += (15 - ft_strlen(text));
+	underscore /= 2;
+	return (underscore);
+}
+
 static void		display_ports(t_queue *queues, char *text)
 {
 	static char	*scan_name[] = { "SYN", "NULL", "FIN", "XMAS", "ACK", "UDP", NULL };
@@ -100,24 +112,18 @@ static void		display_ports(t_queue *queues, char *text)
 	int			opcl		= 0;
 	int			filtered	= 0;
 	int			count		= count_scan_type();
-	int			underscore	= (ft_strlen(text) + 26 + count * 14) / 2;
+	int			underscore	= calc_underscore_length(count, text);
 
 	printf("\n");
 	print_char(underscore, '_');
 	printf("%s", text);
 	print_char(underscore, '_');
 	printf("\n");
-	printf("PORT\tSERVICE\t\tSCAN TYPE(STATUS)");
-	print_char(count * 1.7, '\t');
-	printf("HOST\n");
+	printf("%-5s\t%-10s\t%-17s", "PORT", "SERVICE", "SCAN_TYPE(STATUS)");
+	print_char(count * 1.5, '\t');
+	printf("%-15s\n", "HOST");
 	while (queues)
 	{
-		ptr = NULL;
-		printf("%d", queues->port);
-		print_char(1, '\t');
-		printf("%-10s", queues->service);
-		print_char(1, '\t');
-
 		ptr = queues;
 		scan_types = 0;
 		opcl = 0;
@@ -142,8 +148,7 @@ static void		display_ports(t_queue *queues, char *text)
 		char		*p1 = NULL;
 		char		*p2 = NULL;
 		char		*p3 = NULL;
-		char		*ret = NULL;
-
+		char		*scans = NULL;
 		i = 0;
 		while (scan_name[i]) {
 			if (scan_types & scan_value[i]) {
@@ -152,17 +157,18 @@ static void		display_ports(t_queue *queues, char *text)
 								  (filtered & scan_value[i] ? "(Filtered)" : "(Closed)")), 0);
 				pos = 1;
 				p3 = leaks_free_strjoin(p1, p2);
-				p1 = ret;
-				ret = leaks_free_strjoin(p1, p3);
+				p1 = scans;
+				scans = leaks_free_strjoin(p1, p3);
 			}
 			i++;
 		}
 
-		printf("%s", ret);
-		print_char((ft_strlen(ret) % 8 > 2) ? 2 : 1, '\t');
-		printf("%s\n", queues->host);
-		if (ret)
-			free(ret);
+		printf("%-5d\t", queues->port);
+		printf("%-10s\t", queues->service);
+		printf("%-17s\t", scans);
+		printf("%-15s\n", queues->host);
+		if (scans)
+			free(scans);
 		queues = ptr;
 	}
 }
@@ -198,7 +204,9 @@ static void		sort_open_close(t_queue *head, t_queue **open, t_queue **close)
 	{
 		is_open = head->open && !head->filtered;
 		tail = head;
-		while (tail->next && tail->next->port == head->port)
+		while (tail->next &&
+				tail->next->port == head->port &&
+				!ft_strcmp(tail->next->host, head->host))
 		{
 			if (!is_open)
 				is_open = tail->next->open && !tail->next->filtered;
