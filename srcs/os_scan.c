@@ -105,7 +105,7 @@ static void			recv_msg(int fd)
 		if (tcp_header->rst) {
 			printf("OS: WINDOWS\n");
 		} else {
-			printf("Unkown OS type\n");
+			printf("Unknown OS type\n");
 		 }
 	} else {
 		printf("OS: UNIX (or cant guess)\n");

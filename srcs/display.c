@@ -308,7 +308,7 @@ void		display_handler()
 	t_flag		*closed		= get_flag("closed");
 	float		ms_time		= 0;
 
-//	pthread_mutex_lock(&globals->id_lock);
+	pthread_mutex_lock(&globals->queue_lock);
 	queues = sort_by_port(queues);
 	queues = sort_by_address(queues);
 	parse_not_done(queues);
@@ -321,7 +321,7 @@ void		display_handler()
 	float time_value = ms_time / 1000;
 	printf ("Execution time: %.3fms\n", time_value);
 	free_datas(globals->nmap);
-//	pthread_mutex_unlock(&globals->id_lock);
+	pthread_mutex_unlock(&globals->queue_lock);
 	exit(0);
 }
 
