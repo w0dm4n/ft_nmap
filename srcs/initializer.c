@@ -6,7 +6,7 @@
 /*   By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/10 15:34:01 by frmarinh          #+#    #+#             */
-/*   Updated: 2017/10/07 21:07:17 by root             ###   ########.fr       */
+/*   Updated: 2017/10/04 20:58:52 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,8 @@ void			initializer()
 				else
 					print_error("invalid speedup number [1 - 250]", nmap);
 			}
-			if (load_hosts(multiple_host, nmap) &&
-				load_ports(nmap) &&
-				load_scans_type(nmap) &&
-				load_addresses(nmap))
-			{
+			if (load_hosts(multiple_host, nmap) && load_ports(nmap) && load_scans_type(nmap)
+				&& load_addresses(nmap)) {
 				print_start(nmap);
 				if (!osscan) {
 					instantiate_threads(nmap);
