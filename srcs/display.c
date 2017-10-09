@@ -319,9 +319,9 @@ void		display_handler()
 		display_ports(close_q, "CLOSED_PORTS");
 	ms_time = ((globals->end_time.tv_sec - globals->start_time.tv_sec) * 1000000 + globals->end_time.tv_usec) - globals->start_time.tv_usec;
 	float time_value = ms_time / 1000;
+	pthread_mutex_unlock(&globals->queue_lock);
 	printf ("Execution time: %.3fms\n", time_value);
 	free_datas(globals->nmap);
-	pthread_mutex_unlock(&globals->queue_lock);
 	exit(0);
 }
 
