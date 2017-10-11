@@ -12,12 +12,14 @@
 
 #include "all.h"
 
-static void		add_port(t_nmap *nmap, int port)
+static void		add_port(t_nmap *nmap, int port, bool multiple_host)
 {
 	int		i = 0;
 	bool	in_array = false;
-
 	if (port >= 1 && port <= PORTS_SIZE) {
+		if (multiple_host && (nmap->ports_index > MAX_ON_MULTIPLE_HOSTS)) {
+			return;
+		}
 		while (i < nmap->ports_index) {
 			if (nmap->port[i] == port)
 				in_array = true;
@@ -31,7 +33,7 @@ static void		add_port(t_nmap *nmap, int port)
 	}
 }
 
-bool			load_ports(t_nmap *nmap)
+bool			load_ports(t_nmap *nmap, bool multiple_host)
 {
 	t_flag		*flag = NULL;
 	int			i = 1, p = 0, range_start = 0, range_end = 0, diff = 0;
@@ -40,8 +42,11 @@ bool			load_ports(t_nmap *nmap)
 
 	if (!(nmap->port = (int*)malloc(MAX_PORTS_SCAN * sizeof(int))))
 		return false;
+	if (multiple_host) {
+		printf("Scanning only %d ports for avoid flood due to multiple hosts", MAX_ON_MULTIPLE_HOSTS);
+	}
 	if (!(flag = get_flag("ports"))) {
-		nmap->ports_index = MAX_PORTS_SCAN;
+		nmap->ports_index = (!multiple_host) ? MAX_PORTS_SCAN : MAX_ON_MULTIPLE_HOSTS;
 		while (p < MAX_PORTS_SCAN) {
 			nmap->port[p++] = i++;
 		}
@@ -57,7 +62,7 @@ bool			load_ports(t_nmap *nmap)
 							diff = range_end - range_start;
 							if (diff > 0 && (diff < MAX_PORTS_SCAN)) {
 								while (range_start <= range_end)
-									add_port(nmap, range_start++);
+									add_port(nmap, range_start++, multiple_host);
 							}
 							else
 								printf("ft_mmap: ports range %d-%d invalid.\n", range_start, range_end);
@@ -68,7 +73,7 @@ bool			load_ports(t_nmap *nmap)
 					}
 				}
 				else
-					add_port(nmap, ft_atoi(port[p]));
+					add_port(nmap, ft_atoi(port[p]), multiple_host);
 				p++;
 			}
 			ft_free_array((void **)port);

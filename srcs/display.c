@@ -128,8 +128,9 @@ static void		display_ports(t_queue *queues, char *text)
 					scan_types |= scan_value[i];
 					if (ptr->filtered)
 						filtered |= scan_value[i];
-					else if (ptr->open)
+					if (ptr->open) {
 						opcl |= scan_value[i];
+					}
 					break ;
 				}
 				i++;
@@ -148,8 +149,15 @@ static void		display_ports(t_queue *queues, char *text)
 		while (scan_name[i]) {
 			if (scan_types & scan_value[i]) {
 				my_asprintf(&p1, scan_name[i], pos);
-				my_asprintf(&p2, (opcl & scan_value[i] ? "(Open)" :
-								  (filtered & scan_value[i] ? "(Filtered)" : "(Closed)")), 0);
+				if ((opcl & scan_value[i]) && (filtered & scan_value[i])) {
+					my_asprintf(&p2, "(Open|Filtered)", 0);
+				} else if ((opcl & scan_value[i]) && !(filtered & scan_value[i])) {
+					my_asprintf(&p2, "(Open)", 0);
+				} else if ((filtered & scan_value[i])) {
+					my_asprintf(&p2, "(Closed|Filtered)", 0);
+				} else {
+					my_asprintf(&p2, "(Closed)", 0);
+				}
 				pos = 1;
 				p3 = leaks_free_strjoin(p1, p2);
 				p1 = ret;
@@ -196,7 +204,7 @@ static void		sort_open_close(t_queue *head, t_queue **open, t_queue **close)
 
 	while (head)
 	{
-		is_open = head->open && !head->filtered;
+		is_open = head->open;
 		tail = head;
 		while (tail->next && tail->next->port == head->port)
 		{
@@ -308,15 +316,18 @@ void		display_handler()
 	t_flag		*closed		= get_flag("closed");
 	float		ms_time		= 0;
 
+
 	pthread_mutex_lock(&globals->queue_lock);
 	queues = sort_by_port(queues);
 	queues = sort_by_address(queues);
 	parse_not_done(queues);
 	sort_open_close(queues, &open_q, &close_q);
-	if (open_q)
+	if (open_q) {
 		display_ports(open_q, "OPENED_PORTS");
-	if (close_q && closed)
+	}
+	if (close_q && closed) {
 		display_ports(close_q, "CLOSED_PORTS");
+	}
 	ms_time = ((globals->end_time.tv_sec - globals->start_time.tv_sec) * 1000000 + globals->end_time.tv_usec) - globals->start_time.tv_usec;
 	float time_value = ms_time / 1000;
 	pthread_mutex_unlock(&globals->queue_lock);
@@ -329,6 +340,7 @@ void		init_display(t_nmap *nmap)
 {
 	struct sigaction	act;
 	t_flag				*timeout = get_flag("timeout");
+	int					timeout_value = (timeout && timeout->value) ? ft_atoi(timeout->value) : DEFAULT_TIMEOUT;
 
 	gettimeofday (&globals->end_time, NULL);
 	globals->nmap = nmap;
@@ -338,8 +350,6 @@ void		init_display(t_nmap *nmap)
 	if (sigaction(SIGALRM, &act, NULL) < 0) {
 		exit(0);
 	}
-	printf("Sniffing network for %d ms.. and waiting for answers (%ds)\n",
-			(timeout && timeout->value) ? ft_atoi(timeout->value) : DEFAULT_TIMEOUT,
-			EXECUTION_TIME);
-	alarm(EXECUTION_TIME);
+	printf("Sniffing network for %d ms.. and waiting for answers (%ds)\n", timeout_value, EXECUTION_TIME);
+	alarm(EXECUTION_TIME + (timeout_value > 0) ? (timeout_value / 1000) : 0);
 }

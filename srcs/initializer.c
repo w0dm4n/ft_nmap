@@ -69,7 +69,7 @@ void			initializer()
 				else
 					print_error("invalid speedup number [1 - 250]", nmap);
 			}
-			if (load_hosts(multiple_host, nmap) && load_ports(nmap) && load_scans_type(nmap)
+			if (load_hosts(multiple_host, nmap) && load_ports(nmap, multiple_host) && load_scans_type(nmap)
 				&& load_addresses(nmap)) {
 				print_start(nmap);
 				if (!osscan) {

@@ -49,6 +49,8 @@ void			pcap_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
 		t_queue *queue = find_queue(IPPROTO_UDP, -1);
 		if (queue) {
 			queue->open = false;
+			queue->filtered = false;
+			queue->done = true;
 		}
 	}
     fflush(stdout);
@@ -85,7 +87,7 @@ void				*init_pcap(void *h, t_thread_handler *t)
 	}
 	inet_ntop(AF_INET, (char*) &net, netstr, sizeof (netstr));
 	inet_ntop(AF_INET, (char*) &mask, maskstr, sizeof (maskstr));
-	sprintf(filter_exp, "tcp or udp");
+	sprintf(filter_exp, "tcp or udp or icmp");
 	if (pcap_compile(handle, &fp, filter_exp, 1, mask) != -1) {
 		if (pcap_setfilter(handle, &fp) != -1) {
 			pcount = pcap_dispatch(handle, -1, pcap_dump, NULL);

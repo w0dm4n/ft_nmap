@@ -32,22 +32,23 @@
 # include	<pcap/pcap.h>
 # include	<signal.h>
 
-# define FLAG_SEPARATOR 	"--"
-# define bool 				int
-# define true 				1
-# define false 				0
-# define DEFAULT_THREADS 	1
-# define MAX_PORTS_SCAN 	1024
-# define PORTS_SIZE 		65535
-# define SOCKET				int
-# define SOCKET_ERROR		-1
-# define BYTE				char
-# define DEFAULT_TTL		64
-# define PAYLOAD			""
-# define DEFAULT_INTERFACE	"eth0"
-# define DEFAULT_TIMEOUT	2000
-# define ANSWER_BUFFER		4096
-# define EXECUTION_TIME		5
+# define FLAG_SEPARATOR 		"--"
+# define bool 					int
+# define true 					1
+# define false 					0
+# define DEFAULT_THREADS 		1
+# define MAX_PORTS_SCAN 		1024
+# define PORTS_SIZE 			65535
+# define SOCKET					int
+# define SOCKET_ERROR			-1
+# define BYTE					char
+# define DEFAULT_TTL			64
+# define PAYLOAD				""
+# define DEFAULT_INTERFACE		"eth0"
+# define DEFAULT_TIMEOUT		2000
+# define ANSWER_BUFFER			4096
+# define EXECUTION_TIME			3
+# define MAX_ON_MULTIPLE_HOSTS	24
 
 typedef struct		s_flag
 {
@@ -156,7 +157,7 @@ bool				load_hosts(bool multiple_host, t_nmap *nmap);
 /*
 **	PORTS
 */
-bool				load_ports(t_nmap *nmap);
+bool				load_ports(t_nmap *nmap, bool multiple_host);
 
 /*
 **	GNL
